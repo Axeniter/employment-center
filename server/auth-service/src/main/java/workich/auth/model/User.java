@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.persistence.*;
 import lombok.*;
 
-
 @Entity
 @Builder
 @Data
