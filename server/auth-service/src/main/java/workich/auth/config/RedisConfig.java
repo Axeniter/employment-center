@@ -15,7 +15,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Configuration
-@ConfigurationProperties(prefix = "redis")
+@ConfigurationProperties(prefix = "spring.redis")
 public class RedisConfig {
     private String host;
     private int port;
