@@ -13,7 +13,7 @@ public class TokenBlacklistService {
     
     private final RedisTemplate<String, String> redisTemplate;
     
-    @Value("${token.blacklist.ttl}")
+    @Value("${token.blacklist-ttl}")
     private long blacklistTtl;
     
     private static final String BLACKLIST_KEY_PREFIX = "blacklist:token:";

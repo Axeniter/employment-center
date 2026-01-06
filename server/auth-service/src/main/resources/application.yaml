@@ -42,11 +42,9 @@ spring:
           max-idle: 8
           min-idle: 0
 
-jwt:
-  secret: ${JWT_SECRET}
-  access-expiration: ${JWT_ACCESS_EXPIRATION}
-  refresh-expiration: ${JWT_REFRESH_EXPIRATION}
-
 token:
-  blacklist:
-    ttl: ${TOKEN_BLACKLIST_TTL}
+  secret: ${JWT_SECRET}
+  access-expiration: ${ACCESS_TOKEN_EXPIRATION}
+  refresh-length: ${REFRESH_TOKEN_LENGTH}
+  refresh-expiration: ${REFRESH_TOKEN_EXPIRATION}
+  blacklist-ttl: ${TOKEN_BLACKLIST_TTL}

@@ -24,29 +24,14 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
         if (userDetails instanceof User user) {
             claims.put("id", user.getId());
-            claims.put("email", user.getEmail());
             claims.put("type", user.getUserType());
         }
-        return generateToken(claims, userDetails, jwtConfig.getAccessExpiration());
-    }
-
-    public String generateRefreshToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        if (userDetails instanceof User user) {
-            claims.put("id", user.getId());
-            claims.put("email", user.getEmail());
-            claims.put("type", user.getUserType());
-        }
-        return generateToken(claims, userDetails, jwtConfig.getRefreshExpiration());
-    }
-
-    public String generateToken(Map<String, Object> claims, UserDetails userDetails, Long expiration) {
         return Jwts
         .builder()
         .claims(claims)
         .subject(userDetails.getUsername())
         .issuedAt(new Date(System.currentTimeMillis()))
-        .expiration(new Date(System.currentTimeMillis() + expiration))
+        .expiration(new Date(System.currentTimeMillis() + jwtConfig.getAccessExpiration()))
         .signWith(jwtConfig.getSecretKey(), Jwts.SIG.HS256)
         .compact();
     }
