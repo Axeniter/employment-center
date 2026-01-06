@@ -3,9 +3,9 @@ package workich.auth.service;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
@@ -20,20 +20,18 @@ public class JwtService {
     private final JwtConfig jwtConfig;
     private final TokenBlacklistService tokenBlacklistService;
 
-    public String generateAccessToken(UserDetails userDetails) {
+    public String generateAccessToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        if (userDetails instanceof User user) {
-            claims.put("id", user.getId());
-            claims.put("type", user.getUserType());
-        }
+        claims.put("email", user.getEmail());
+        claims.put("type", user.getUserType());
         return Jwts
-        .builder()
-        .claims(claims)
-        .subject(userDetails.getUsername())
-        .issuedAt(new Date(System.currentTimeMillis()))
-        .expiration(new Date(System.currentTimeMillis() + jwtConfig.getAccessExpiration()))
-        .signWith(jwtConfig.getSecretKey(), Jwts.SIG.HS256)
-        .compact();
+            .builder()
+            .claims(claims)
+            .subject(user.getId().toString())
+            .issuedAt(new Date(System.currentTimeMillis()))
+            .expiration(new Date(System.currentTimeMillis() + jwtConfig.getAccessExpiration()))
+            .signWith(jwtConfig.getSecretKey(), Jwts.SIG.HS256)
+            .compact();
     }
 
     private Claims extractAllClaims(String token) {
@@ -46,21 +44,22 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+    public UUID extractId(String token) {
+        String subject = extractClaim(token, Claims::getSubject);
+        return UUID.fromString(subject);
     }
 
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
+    public boolean isTokenValid(String token, User user) {
+        UUID id = extractId(token);
 
         if (tokenBlacklistService.isBlacklisted(token)) {
             return false;
         }
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        return (id.equals(user.getId())) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {

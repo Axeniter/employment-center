@@ -42,10 +42,11 @@ public class RefreshTokenService {
         redisTemplate.expire(userKey, refreshTokenExpiration, TimeUnit.MILLISECONDS);
     }
 
-    public String getUserIdByToken(String refreshToken)
+    public UUID getUserIdByToken(String refreshToken)
     {
         String key = REFRESH_TOKEN_PREFIX + refreshToken;
-        return redisTemplate.opsForValue().get(key);
+        String idStr = redisTemplate.opsForValue().get(key);
+        return UUID.fromString(idStr);
     }
 
     public boolean isTokenValid(String refreshToken) {
