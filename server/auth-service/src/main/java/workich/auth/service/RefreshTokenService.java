@@ -18,10 +18,10 @@ public class RefreshTokenService {
     private static final String REFRESH_TOKEN_PREFIX = "refresh:token:";
     private static final String USER_TOKENS_PREFIX = "user:tokens:";
 
-    @Value("$token.refresh-length")
+    @Value("${token.refresh-length}")
     private int refreshTokenLength;
 
-    @Value("$token.refresh-expiration")
+    @Value("${token.refresh-expiration}")
     private long refreshTokenExpiration;
 
     public String generateRefreshToken() {

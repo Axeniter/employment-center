@@ -19,7 +19,7 @@ public class AuthController {
     private final AuthService authService;
     
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<AuthResponse>> registerEmployer(
+    public ResponseEntity<ApiResponse<AuthResponse>> register(
             @Valid @RequestBody RegisterRequest request) {
         AuthResponse response = authService.register(request);
         return ResponseEntity
