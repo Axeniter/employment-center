@@ -1,31 +1,26 @@
 from pydantic import BaseModel
 from typing import Optional, List
 from uuid import UUID
+from datetime import datetime
 
-class VacancyBase(BaseModel):
+class EventBase(BaseModel):
     title: str
     description: str
-    tags: List[str] = []
-    salary_from: int
-    salary_to: int
-    salary_currency: str = "RUB"
     location: Optional[str] = None
     is_remote: bool = False
+    date: datetime
 
-class VacancyCreate(VacancyBase):
+class EventCreate(EventBase):
     pass
 
-class VacancyUpdate(BaseModel):
+class EventUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
-    tags: Optional[List[str]] = None
-    salary_from: Optional[int] = None
-    salary_to: Optional[int] = None
-    salary_currency: Optional[str] = None
     location: Optional[str] = None
     is_remote: Optional[bool] = None
+    date: Optional[datetime] = None
 
-class VacancyResponse(VacancyBase):
+class EventResponse(EventBase):
     id: int
     employer_id: UUID
     is_active: bool
