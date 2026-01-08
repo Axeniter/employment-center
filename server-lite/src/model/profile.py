@@ -1,6 +1,6 @@
 from database import Base
-from sqlalchemy import Column, String, ForeignKey, DateTime, Text, ARRAY
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, String, ForeignKey, DateTime, Text
+from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.orm import relationship
 from user import UserRole
 
@@ -30,6 +30,8 @@ class ApplicantProfile(BaseProfile):
 
     user = relationship("User", back_populates="applicant_profile", uselist=False)
 
+    responses = relationship("Response", back_populates="applicant", foreign_keys="Response.applicant_id")
+
     @property
     def profile_type(self) -> UserRole:
         return UserRole.APPLICANT
@@ -42,6 +44,8 @@ class EmployerProfile(BaseProfile):
     contact = Column(Text)
 
     user = relationship("User", back_populates="employer_profile", uselist=False)
+    
+    vacancies = relationship("Vacancy", back_populates="employer", foreign_keys="Vacancy.employer_id")
 
     @property
     def profile_type(self) -> UserRole:
