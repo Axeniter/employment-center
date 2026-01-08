@@ -24,7 +24,7 @@ class ApplicantProfileUpdate(ProfileBase):
     birth_date: Optional[datetime] = None
     city: Optional[str] = None
     about:  Optional[str] = None
-    skills: List[str] = []
+    skills: Optional[List[str]] = None
 
 class EmployerProfileCreate(ProfileBase):
     company_name: str

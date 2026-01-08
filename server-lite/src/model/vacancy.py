@@ -15,7 +15,7 @@ class Vacancy(Base):
     salary_from = Column(Integer, nullable=False)
     salary_to = Column(Integer, nullable=False)
     salary_currency = Column(String(3), default="RUB", nullable=False)
-    location = Column(String(100), nullable=False)
+    location = Column(String(100), nullable=True)
     is_remote = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
     
