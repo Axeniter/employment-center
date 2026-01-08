@@ -24,7 +24,7 @@ class Vacancy(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
-    employer = relationship("User", back_populates="vacancies")
+    employer = relationship("EmployerProfile", back_populates="vacancies")
     responses = relationship("Response", back_populates="vacancy")
 
 class ResponseStatus(str, enum.Enum):
@@ -45,4 +45,4 @@ class Response(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     vacancy = relationship("Vacancy", back_populates="responses")
-    applicant = relationship("User", back_populates="responses")
+    applicant = relationship("ApplicantProfile", back_populates="responses")

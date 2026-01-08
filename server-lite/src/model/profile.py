@@ -30,7 +30,7 @@ class ApplicantProfile(BaseProfile):
 
     user = relationship("User", back_populates="applicant_profile", uselist=False)
 
-    responses = relationship("Response", back_populates="applicant", foreign_keys="Response.applicant_id")
+    responses = relationship("Response", back_populates="applicant")
 
     @property
     def profile_type(self) -> UserRole:
@@ -45,7 +45,8 @@ class EmployerProfile(BaseProfile):
 
     user = relationship("User", back_populates="employer_profile", uselist=False)
     
-    vacancies = relationship("Vacancy", back_populates="employer", foreign_keys="Vacancy.employer_id")
+    vacancies = relationship("Vacancy", back_populates="employer")
+    events = relationship("Event", back_populates="employer")
 
     @property
     def profile_type(self) -> UserRole:
