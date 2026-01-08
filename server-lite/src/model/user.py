@@ -1,9 +1,10 @@
 from database import Base
 import enum
-from sqlalchemy import Column, Integer, String, Enum, Boolean,DateTime
+from sqlalchemy import Column, String, Enum, Boolean, DateTime
 from sqlalchemy.sql import func
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 
 class UserRole(str, enum.Enum):
     APPLICANT = "applicant"
@@ -18,3 +19,6 @@ class User(Base):
     role = Column(Enum(UserRole), nullable=False)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    applicant_profile = relationship("ApplicantProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    employer_profile = relationship("EmployerProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
