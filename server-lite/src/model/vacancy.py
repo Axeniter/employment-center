@@ -19,7 +19,7 @@ class Vacancy(Base):
     is_remote = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
     
-    employer_id = Column(UUID, ForeignKey("users.id"), nullable=False)
+    employer_id = Column(UUID, ForeignKey("employer_profiles.user_id"), nullable=False)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -39,7 +39,7 @@ class Response(Base):
     status = Column(Enum(ResponseStatus), default=ResponseStatus.PENDING)
     
     vacancy_id = Column(Integer, ForeignKey("vacancies.id"), nullable=False)
-    applicant_id = Column(UUID, ForeignKey("users.id"), nullable=False)
+    applicant_id = Column(UUID, ForeignKey("applicant_profiles.user_id"), nullable=False)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
