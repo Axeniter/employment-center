@@ -12,16 +12,8 @@ async def get_vacancy_by_id(db: AsyncSession, vacancy_id: int) -> Optional[Vacan
     result = await db.execute(select(Vacancy).filter(Vacancy.id == vacancy_id))
     return result.scalar_one_or_none()
 
-async def get_vacancies(db: AsyncSession, skip: int = 0,
-                         limit: int = 100, employer_id: Optional[UUID] = None) -> List[Vacancy]:
-    query = select(Vacancy)
-    
-    if employer_id:
-        query = query.where(Vacancy.employer_id == employer_id)
-    
-    query = query.offset(skip).limit(limit)
-    
-    result = await db.execute(query)
+async def get_vacancies_by_employer(db: AsyncSession, employer_id: UUID) -> List[Vacancy]:
+    result = await db.execute(select(Vacancy).where(Vacancy.employer_id == employer_id))
     return result.scalars().all()
 
 async def create_vacancy(db: AsyncSession, vacancy: VacancyCreate, employer_id: UUID) -> Vacancy:
