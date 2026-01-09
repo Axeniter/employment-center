@@ -4,8 +4,9 @@ from models.user import User
 from schemas.user import UserCreate
 from core.security import get_password_hash, verify_password
 from typing import Optional
+from uuid import UUID
 
-async def get_user_by_id(db: AsyncSession, user_id: int) -> Optional[User]:
+async def get_user_by_id(db: AsyncSession, user_id: UUID) -> Optional[User]:
     result = await db.execute(select(User).filter(User.id == user_id))
     return result.scalar_one_or_none()
 
