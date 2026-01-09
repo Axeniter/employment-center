@@ -1,6 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
-from model.user import UserRole
+from models.user import UserRole
 from uuid import UUID
 
 class Token(BaseModel):

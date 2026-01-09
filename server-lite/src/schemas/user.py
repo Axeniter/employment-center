@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from model.user import UserRole
+from models.user import UserRole
 from uuid import UUID
 
 class UserBase(BaseModel):
