@@ -22,3 +22,11 @@ class User(Base):
 
     applicant_profile = relationship("ApplicantProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
     employer_profile = relationship("EmployerProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
+
+    @property
+    def profile(self):
+        if self.role == UserRole.APPLICANT:
+            return self.applicant_profile
+        elif self.role == UserRole.EMPLOYER:
+            return self.employer_profile
+        return None
