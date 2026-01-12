@@ -6,7 +6,6 @@ class MessageBase(BaseModel):
     content: str
 
 class MessageCreate(MessageBase):
-    response_id: UUID
     receiver_id: UUID
 
 class MessageResponse(MessageBase):

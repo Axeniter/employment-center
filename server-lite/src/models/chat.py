@@ -10,8 +10,8 @@ class Message(Base):
     id = Column(Integer, primary_key=True, index=True)
     content = Column(Text, nullable=False)
     
-    sender_id = Column(UUID, ForeignKey("users.id"), nullable=False)
-    receiver_id = Column(UUID, ForeignKey("users.id"), nullable=False)
+    sender_id = Column(UUID, ForeignKey("users.id"), nullable=False, index=True)
+    receiver_id = Column(UUID, ForeignKey("users.id"), nullable=False, index=True)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     

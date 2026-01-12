@@ -1,9 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 from models.profile import ApplicantProfile, EmployerProfile
 from schemas.profile import ApplicantProfileCreate, ApplicantProfileUpdate, EmployerProfileCreate, EmployerProfileUpdate
-from typing import Optional
 from models.user import User, UserRole
 from uuid import UUID
 
