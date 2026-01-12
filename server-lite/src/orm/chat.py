@@ -3,7 +3,6 @@ from sqlalchemy.future import select
 from sqlalchemy import desc, or_, and_, func
 from sqlalchemy.orm import joinedload
 from typing import List, Optional, Tuple
-from datetime import datetime
 from uuid import UUID
 from schemas.chat import MessageCreate
 from models.chat import Message

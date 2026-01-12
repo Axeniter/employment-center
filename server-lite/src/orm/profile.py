@@ -4,8 +4,11 @@ from models.profile import ApplicantProfile, EmployerProfile
 from schemas.profile import ApplicantProfileCreate, ApplicantProfileUpdate, EmployerProfileCreate, EmployerProfileUpdate
 from models.user import User, UserRole
 from uuid import UUID
+from typing import Union, Optional
 
-async def get_profile_by_id(db: AsyncSession, user_id: UUID):
+ProfileType = Union[ApplicantProfile, EmployerProfile, None]
+
+async def get_profile_by_id(db: AsyncSession, user_id: UUID) -> ProfileType:
     user_result = await db.execute(
         select(User).where(User.id == user_id)
     )
@@ -28,7 +31,7 @@ async def get_profile_by_id(db: AsyncSession, user_id: UUID):
         return result.scalar_one_or_none()
 
 
-async def create_applicant_profile(db: AsyncSession, user_id: UUID, profile: ApplicantProfileCreate):
+async def create_applicant_profile(db: AsyncSession, user_id: UUID, profile: ApplicantProfileCreate) -> ApplicantProfile:
     db_profile = ApplicantProfile(
         user_id=user_id,
         **profile.model_dump()
@@ -39,7 +42,7 @@ async def create_applicant_profile(db: AsyncSession, user_id: UUID, profile: App
     return db_profile
 
 
-async def create_employer_profile(db: AsyncSession, user_id: UUID, profile: EmployerProfileCreate):
+async def create_employer_profile(db: AsyncSession, user_id: UUID, profile: EmployerProfileCreate) -> EmployerProfile:
     db_profile = EmployerProfile(
         user_id=user_id,
         **profile.model_dump()
@@ -49,7 +52,7 @@ async def create_employer_profile(db: AsyncSession, user_id: UUID, profile: Empl
     await db.refresh(db_profile)
     return db_profile
 
-async def update_applicant_profile(db: AsyncSession, user_id: UUID, profile: ApplicantProfileUpdate):
+async def update_applicant_profile(db: AsyncSession, user_id: UUID, profile: ApplicantProfileUpdate) -> Optional[ApplicantProfile]:
     db_profile = await get_profile_by_id(db, user_id)
     if not db_profile:
         return None
@@ -65,7 +68,7 @@ async def update_applicant_profile(db: AsyncSession, user_id: UUID, profile: App
     await db.refresh(db_profile)
     return db_profile
 
-async def update_employer_profile(db: AsyncSession, user_id: UUID, profile: EmployerProfileUpdate):
+async def update_employer_profile(db: AsyncSession, user_id: UUID, profile: EmployerProfileUpdate) -> Optional[EmployerProfile]:
     db_profile = await get_profile_by_id(db, user_id)
     if not db_profile:
         return None
@@ -81,10 +84,10 @@ async def update_employer_profile(db: AsyncSession, user_id: UUID, profile: Empl
     await db.refresh(db_profile)
     return db_profile
 
-async def delete_profile(db: AsyncSession, user_id: UUID):
+async def delete_profile(db: AsyncSession, user_id: UUID) -> bool:
     db_profile = await get_profile_by_id(db, user_id)
     if not db_profile:
-        return None
+        return False
     
     await db.delete(db_profile)
     await db.commit()
