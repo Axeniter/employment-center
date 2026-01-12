@@ -12,10 +12,8 @@ class Message(Base):
     
     sender_id = Column(UUID, ForeignKey("users.id"), nullable=False)
     receiver_id = Column(UUID, ForeignKey("users.id"), nullable=False)
-    response_id = Column(Integer, ForeignKey("responses.id"))
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     sender = relationship("User", back_populates="sent_messages", foreign_keys=[sender_id])
     receiver = relationship("User", back_populates="received_messages", foreign_keys=[receiver_id])
-    response = relationship("Response")

@@ -11,7 +11,6 @@ class MessageCreate(MessageBase):
 
 class MessageResponse(MessageBase):
     id: int
-    response_id: int
     sender_id: UUID
     receiver_id: UUID
     created_at: datetime
