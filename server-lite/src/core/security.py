@@ -37,7 +37,7 @@ async def set_refresh_token(user_id: UUID, refresh_token: str):
         rd = await get_redis_client()
         await rd.setex(key, config.REFRESH_TOKEN_EXPIRE_DAYS * 86400, str(user_id))
     
-async def get_user_by_refresh_token(refresh_token: str) -> Optional[UUID]:
+async def get_user_id_by_refresh_token(refresh_token: str) -> Optional[UUID]:
     key = f"refresh_token:{refresh_token}"
     rd = await get_redis_client()
     user_id_str =  await rd.get(key)
