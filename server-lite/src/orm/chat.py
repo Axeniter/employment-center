@@ -45,7 +45,7 @@ async def get_conversation_messages(db: AsyncSession, user1_id: UUID, user2_id: 
         .offset(skip)
         .limit(limit)
     )
-    return result.scalars().all()
+    return list(result.scalars().all())
 
 
 async def get_user_conversations(db: AsyncSession, user_id: UUID) -> List[Tuple[UUID, Message]]:
@@ -84,4 +84,4 @@ async def get_user_conversations(db: AsyncSession, user_id: UUID) -> List[Tuple[
     )
     
     result = await db.execute(last_messages_query)
-    return result.scalars().all()
+    return list(result.scalars().all())
