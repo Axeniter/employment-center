@@ -1,6 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import declarative_base
 from config import config
+import redis.asyncio as redis
+
+redis_client = redis.Redis.from_url(config.REDIS_URL, decode_responses=True)
 
 engine = create_async_engine(
     config.DATABASE_URL,
@@ -26,3 +29,9 @@ async def get_db():
             raise
         finally:
             await session.close()
+
+async def get_redis_client() -> redis.Redis:
+    return redis_client
+
+async def close_redis():
+    await redis_client.close()

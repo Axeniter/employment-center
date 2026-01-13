@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, Text, DateTime, ForeignKey
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
-from database import Base
+from core.database import Base
 
 class Message(Base):
     __tablename__ = "messages"

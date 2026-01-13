@@ -4,7 +4,6 @@ from fastapi import UploadFile, HTTPException
 from typing import Optional
 from config import config
 
-
 async def save_upload_file(file: UploadFile, user_id: UUID) -> Optional[str]:
     try:
         if not file.filename:
@@ -44,7 +43,6 @@ async def save_upload_file(file: UploadFile, user_id: UUID) -> Optional[str]:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error saving file: {str(e)}")
-
 
 def delete_file(file_url: str):
     try:

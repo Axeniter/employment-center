@@ -2,11 +2,10 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
-from core.security import verify_token
+from security import verify_token
 from orm.user import get_user_by_id
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
-
 
 async def get_current_user(
     db: AsyncSession = Depends(get_db),
@@ -32,7 +31,6 @@ async def get_current_user(
     
     return user
 
-
 async def get_current_active_user(current_user = Depends(get_current_user)):
     if not current_user.is_active:
         raise HTTPException(
@@ -40,7 +38,6 @@ async def get_current_active_user(current_user = Depends(get_current_user)):
             detail="Inactive user"
         )
     return current_user
-
 
 def require_role(required_role: str):
     async def role_checker(
