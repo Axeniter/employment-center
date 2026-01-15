@@ -8,9 +8,9 @@ from core.security import (create_access_token, create_and_save_refresh_token, g
 from orm.user import create_user, get_user_by_email, authenticate_user, get_user_by_id
 from core.dependencies import get_current_user
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
-@router.post("/register", response_model=UserResponse)
+@auth_router.post("/register", response_model=UserResponse)
 async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
     user = await get_user_by_email(db, user_data.email)
     if user:
@@ -19,7 +19,7 @@ async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
     user = await create_user(db, user_data)
     return user
 
-@router.post("/login", response_model=Token)
+@auth_router.post("/login", response_model=Token)
 async def login(user_data: UserLogin, db: AsyncSession = Depends(get_db)):
     user = await authenticate_user(db, user_data.email, user_data.password)
     if not user:
@@ -34,7 +34,7 @@ async def login(user_data: UserLogin, db: AsyncSession = Depends(get_db)):
 
     return Token(access_token=access_token, refresh_token=refresh_token)
 
-@router.post("/refresh", response_model=Token)
+@auth_router.post("/refresh", response_model=Token)
 async def refresh_token(refresh_data: RefreshTokenRequest, db: AsyncSession = Depends(get_db)):
     user_id = await get_user_id_by_refresh_token(refresh_data.refresh_token)
     if not user_id:
