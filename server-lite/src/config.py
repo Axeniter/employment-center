@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     # Postgresql
     POSTGRES_HOST: str = "localhost"
     POSTGRES_PORT: str = "5432"
-    POSTGRES_DB: str = "postgres_db"
+    POSTGRES_DB: str = "workich_db"
     POSTGRES_USER: str = "postgres"
     POSTGRES_PASSWORD: str = "password"
     LOG_SQL: bool = True
