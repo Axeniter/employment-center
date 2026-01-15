@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 from uuid import UUID
-from typing import Optional, List
+from typing import Optional, List, Literal
 from datetime import datetime
+from models.user import UserRole
 
 class ProfileBase(BaseModel):
     avatar_url: Optional[str] = None
@@ -37,6 +38,7 @@ class EmployerProfileUpdate(ProfileBase):
     contact: Optional[str] = None
 
 class ApplicantProfileResponse(ProfileBase):
+    profile_type: Literal[UserRole.APPLICANT] = UserRole.APPLICANT
     user_id: UUID
     first_name: str
     last_name: str
@@ -51,6 +53,7 @@ class ApplicantProfileResponse(ProfileBase):
         from_attributes = True
 
 class EmployerProfileResponse(ProfileBase):
+    profile_type: Literal[UserRole.EMPLOYER] = UserRole.EMPLOYER
     user_id: UUID
     company_name: str
     description: str
