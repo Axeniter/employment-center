@@ -25,67 +25,13 @@
                        Radius="10"/>
             </Border.Shadow>
 
-            <VerticalStackLayout Spacing="25">
+            <VerticalStackLayout Spacing="30">
 
                 <!-- Заголовок -->
                 <Label Text="Авторизация"
-                       FontSize="28"
+                       FontSize="32"
                        HorizontalOptions="Center"
                        TextColor="Black"/>
-
-                <!-- Переключатель соискатель/работодатель -->
-                <Grid ColumnDefinitions="*,*"
-                      ColumnSpacing="10">
-
-                    <!-- Соискатель -->
-                    <Border x:Name="ApplicantBorder"
-                            Stroke="Transparent"
-                            BackgroundColor="#9dfca8"
-                            StrokeThickness="0"
-                            HeightRequest="50"
-                            HorizontalOptions="Fill"
-                            Padding="0">
-                        
-                        <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="10"/>
-                        </Border.StrokeShape>
-
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="ApplicantBorder_Tapped" />
-                        </Border.GestureRecognizers>
-
-                        <Label Text="соискатель"
-                               FontSize="16"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center"
-                               TextColor="Black"/>
-                    </Border>
-
-                    <!-- Работодатель -->
-                    <Border x:Name="EmployerBorder"
-                            Grid.Column="1"
-                            Stroke="Transparent"
-                            BackgroundColor="#e0e0e0"
-                            StrokeThickness="0"
-                            HeightRequest="50"
-                            HorizontalOptions="Fill"
-                            Padding="0">
-
-                        <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="10"/>
-                        </Border.StrokeShape>
-
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="EmployerBorder_Tapped" />
-                        </Border.GestureRecognizers>
-
-                        <Label Text="работодатель"
-                               FontSize="16"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center"
-                               TextColor="Black"/>
-                    </Border>
-                </Grid>
 
                 <!-- Поле почты -->
                 <VerticalStackLayout Spacing="5">
@@ -100,7 +46,7 @@
                             HorizontalOptions="Fill">
 
                         <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="10"/>
+                            <RoundRectangle CornerRadius="12"/>
                         </Border.StrokeShape>
 
                         <Entry x:Name="EmailEntry"
@@ -113,7 +59,6 @@
                                TextColor="Black"/>
 
                     </Border>
-
                 </VerticalStackLayout>
 
                 <!-- Поле пароля -->
@@ -129,7 +74,7 @@
                            HorizontalOptions="Fill">
 
                         <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="10"/>
+                            <RoundRectangle CornerRadius="12"/>
                         </Border.StrokeShape>
 
                         <Entry x:Name="PasswordEntry"
@@ -150,19 +95,18 @@
                        Text="нет аккаунта?"
                        FontSize="14"
                        TextColor="Black"
-                       HorizontalOptions="Start">
-                </Label>
+                       HorizontalOptions="Start"/>
 
                 <!-- Кнопка ВОЙТИ -->
                 <Button x:Name="LoginButton"
                         Text="ВОЙТИ"
                         BackgroundColor="#9dfca8"
                         TextColor="Black"
-                        FontSize="18"
+                        FontSize="20"
                         FontAttributes="Bold"
-                        CornerRadius="10"
+                        CornerRadius="12"
                         HeightRequest="55"
-                        Margin="0,10,0,0"/>
+                        Margin="0,15,0,0"/>
 
             </VerticalStackLayout>
         </Border>
