@@ -39,15 +39,20 @@
 
                     <!-- Соискатель -->
                     <Border x:Name="ApplicantBorder"
-                           Stroke="Transparent"
-                           BackgroundColor="#9dfca8"
-                           StrokeThickness="0"
-                           HeightRequest="50"
-                           HorizontalOptions="Fill"
-                           Padding="0">
+                            Stroke="Transparent"
+                            BackgroundColor="#9dfca8"
+                            StrokeThickness="0"
+                            HeightRequest="50"
+                            HorizontalOptions="Fill"
+                            Padding="0">
+                        
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="10"/>
                         </Border.StrokeShape>
+
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="ApplicantBorder_Tapped" />
+                        </Border.GestureRecognizers>
 
                         <Label Text="соискатель"
                                FontSize="16"
@@ -58,17 +63,21 @@
 
                     <!-- Работодатель -->
                     <Border x:Name="EmployerBorder"
-                           Grid.Column="1"
-                           Stroke="Transparent"
-                           BackgroundColor="#9dfca8"
-                           StrokeThickness="0"
-                           HeightRequest="50"
-                           HorizontalOptions="Fill"
-                           Padding="0">
+                            Grid.Column="1"
+                            Stroke="Transparent"
+                            BackgroundColor="#e0e0e0"
+                            StrokeThickness="0"
+                            HeightRequest="50"
+                            HorizontalOptions="Fill"
+                            Padding="0">
 
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="10"/>
                         </Border.StrokeShape>
+
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="EmployerBorder_Tapped" />
+                        </Border.GestureRecognizers>
 
                         <Label Text="работодатель"
                                FontSize="16"
