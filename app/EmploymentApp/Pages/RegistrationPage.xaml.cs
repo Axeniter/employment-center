@@ -42,11 +42,39 @@ public partial class RegistrationPage : ContentPage
     // В RegisterButton_Click добавь проверку паролей
     private void RegisterButton_Clicked(object sender, EventArgs e)
     {
+        if (string.IsNullOrWhiteSpace(EmailEntry.Text))
+        {
+            DisplayAlert("Ошибка", "Введите почту", "OK");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(PasswordEntry.Text))
+        {
+            DisplayAlert("Ошибка", "Введите пароль", "OK");
+            return;
+        }
+
         if (PasswordEntry.Text != ConfirmPasswordEntry.Text)
         {
             DisplayAlert("Ошибка", "Пароли не совпадают", "OK");
+
+            PasswordEntry.Text = "";
+            ConfirmPasswordEntry.Text = "";
+
             return;
         }
+
+        if (PasswordEntry.Text.Length < 8)
+        {
+            DisplayAlert("Ошибка", "Длина пароля меньше 8 символов", "OK");
+
+            PasswordEntry.Text = "";
+
+            return;
+        }
+
+        DisplayAlert("Успех", "Аккаунт создан", "OK");
+        return;
         // TODO: регистрация
     }
 }

@@ -11,4 +11,6 @@ public partial class LoginPage : ContentPage
     {
         Shell.Current.GoToAsync("//RegistrationPage");
     }
+
+
 }
