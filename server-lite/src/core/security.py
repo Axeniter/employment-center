@@ -3,7 +3,7 @@ import jwt
 from passlib.context import CryptContext
 from fastapi import HTTPException, status
 from config import config
-from database import get_redis_client
+from .database import get_redis_client
 from uuid import UUID
 from typing import Optional
 import secrets

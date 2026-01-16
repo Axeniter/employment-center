@@ -1,10 +1,14 @@
+import sys
+import os
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "src"))
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from config import config
 from core.database import Base, engine
 from api.api import api_router
-import os
 
 os.makedirs(config.UPLOAD_DIR, exist_ok=True)
 

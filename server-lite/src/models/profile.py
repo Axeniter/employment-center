@@ -2,13 +2,13 @@ from core.database import Base
 from sqlalchemy import Column, String, ForeignKey, DateTime, Text
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.orm import relationship
-from user import UserRole
+from .user import UserRole
 
 class BaseProfile(Base):
     __abstract__ = True
 
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"),
-                     primary_key=True, index=True, ondelete="CASCADE")
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"),
+                     primary_key=True, index=True)
     avatar_url = Column(String(500), nullable=True)
 
     @property

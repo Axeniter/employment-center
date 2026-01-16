@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from endpoints import (auth, profile)
+from .endpoints import (auth, profile)
 
 api_router = APIRouter(prefix="/api")
 

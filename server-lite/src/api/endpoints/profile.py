@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, status
 from typing import Union
 from schemas.profile import (ApplicantProfileResponse, EmployerProfileResponse, ApplicantProfileCreate, ApplicantProfileUpdate, 
                              EmployerProfileCreate, EmployerProfileUpdate)
