@@ -17,7 +17,7 @@ profile_router = APIRouter(prefix="/profile", tags=["profile"])
 @profile_router.get("/me", response_model=Union[ApplicantProfileResponse, EmployerProfileResponse])
 async def get_my_profile(user = Depends(get_current_active_user), db = Depends(get_db)):
     profile = await get_profile_by_id(db, user.id)
-    if not user.profile:
+    if not profile:
         raise HTTPException(status_code=404, detail="Profile doesn't exist")
     
     return profile

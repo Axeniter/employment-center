@@ -28,7 +28,7 @@ async def login(user_data: UserLogin, db: AsyncSession = Depends(get_db)):
                             headers={"WWW-Authenticate": "Bearer"})
     
     access_token = create_access_token({"email": user.email,
-                                        "user_id": user.id,
+                                        "user_id": str(user.id),
                                         "role": user.role})
     refresh_token = await create_and_save_refresh_token(user.id)
 
@@ -45,7 +45,7 @@ async def refresh_token(refresh_data: RefreshTokenRequest, db: AsyncSession = De
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     
     access_token = create_access_token({"email": user.email,
-                                        "user_id": user.id,
+                                        "user_id": str(user.id),
                                         "role": user.role})
     await delete_refresh_token(refresh_data.refresh_token)
     refresh_token = await create_and_save_refresh_token(user.id)
