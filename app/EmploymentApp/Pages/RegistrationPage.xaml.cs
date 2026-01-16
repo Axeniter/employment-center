@@ -10,6 +10,11 @@ public partial class RegistrationPage : ContentPage
         SetApplicantSelected(); // по умолчанию соискатель
     }
 
+    private void LoginLabel_Tapped(object sender, TappedEventArgs e)
+    {
+        Shell.Current.GoToAsync("//LoginPage");
+    }
+
     private void ApplicantBorder_Tapped(object sender, TappedEventArgs e)
     {
         _isEmployerSelected = false;

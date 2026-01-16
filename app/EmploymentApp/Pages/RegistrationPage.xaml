@@ -178,7 +178,12 @@
                        FontSize="14"
                        TextColor="Black"
                        HorizontalOptions="Start">
+                    
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="LoginLabel_Tapped" />
+                    </Label.GestureRecognizers>
                 </Label>
+
 
                 <!-- Кнопка ЗАРЕГИСТРИРОВАТЬСЯ -->
                 <Button x:Name="RegisterButton"

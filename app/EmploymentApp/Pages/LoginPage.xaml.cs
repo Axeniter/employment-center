@@ -6,4 +6,9 @@ public partial class LoginPage : ContentPage
     {
         InitializeComponent();
     }
+
+    private void RegisterLabel_Tapped(object sender, TappedEventArgs e)
+    {
+        Shell.Current.GoToAsync("//RegistrationPage");
+    }
 }

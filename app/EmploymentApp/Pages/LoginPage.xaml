@@ -95,7 +95,12 @@
                        Text="нет аккаунта?"
                        FontSize="14"
                        TextColor="Black"
-                       HorizontalOptions="Start"/>
+                       HorizontalOptions="Start">
+                    
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="RegisterLabel_Tapped" />
+                    </Label.GestureRecognizers>
+                </Label>
 
                 <!-- Кнопка ВОЙТИ -->
                 <Button x:Name="LoginButton"
