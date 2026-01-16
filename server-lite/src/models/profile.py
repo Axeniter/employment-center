@@ -4,7 +4,6 @@ from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.orm import relationship
 from user import UserRole
 
-
 class BaseProfile(Base):
     __abstract__ = True
 
