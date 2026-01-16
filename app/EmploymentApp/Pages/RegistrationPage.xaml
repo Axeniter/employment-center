@@ -196,7 +196,8 @@
                         HeightRequest="55"
                         Margin="0,10,0,0"
                         BorderColor="Transparent"
-                        BorderWidth="0"/>       
+                        BorderWidth="0"
+                        Clicked="RegisterButton_Clicked"/>       
 
             </VerticalStackLayout>
         </Border>
