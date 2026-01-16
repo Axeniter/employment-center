@@ -27,8 +27,7 @@ async def lifespan(app: FastAPI):
     await init_db()
     yield
 
-print("жопа")
-app = FastAPI(title="Workich")
+app = FastAPI(title="Workich", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -41,6 +40,8 @@ app.add_middleware(
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 app.include_router(api_router)
+
+print("жопа")
 
 @app.get("/")
 async def root():

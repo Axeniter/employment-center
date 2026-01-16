@@ -23,6 +23,22 @@ class User(Base):
     applicant_profile = relationship("ApplicantProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
     employer_profile = relationship("EmployerProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
 
+    sent_messages = relationship(
+        "Message", 
+        foreign_keys="Message.sender_id",
+        back_populates="sender",
+        cascade="all, delete-orphan",
+        lazy="dynamic"
+    )
+    
+    received_messages = relationship(
+        "Message", 
+        foreign_keys="Message.receiver_id",
+        back_populates="receiver",
+        cascade="all, delete-orphan",
+        lazy="dynamic"
+    )
+
     @property
     def profile(self):
         if self.role == UserRole.APPLICANT:
