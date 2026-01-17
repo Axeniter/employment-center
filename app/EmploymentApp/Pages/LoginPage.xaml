@@ -98,7 +98,7 @@
                        HorizontalOptions="Start">
                     
                     <Label.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="RegisterLabel_Tapped" />
+                        <TapGestureRecognizer Command="{Binding NavigateToRegistrationCommand}" />
                     </Label.GestureRecognizers>
                 </Label>
 

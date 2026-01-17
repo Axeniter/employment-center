@@ -1,16 +1,13 @@
+using EmploymentApp.Viewmodels;
+
 namespace EmploymentApp.Pages;
 
 public partial class LoginPage : ContentPage
 {
-    public LoginPage()
+    public LoginPage(LoginViewModel vm)
     {
         InitializeComponent();
+        BindingContext = vm;
     }
-
-    private void RegisterLabel_Tapped(object sender, TappedEventArgs e)
-    {
-        Shell.Current.GoToAsync("//RegistrationPage");
-    }
-
 
 }
