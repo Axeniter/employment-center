@@ -36,6 +36,17 @@ async def update_vacancy(db: AsyncSession, vacancy_id: int, vacancy: VacancyUpda
     await db.refresh(db_vacancy)
     return db_vacancy
 
+async def toggle_vacancy_active(db: AsyncSession, vacancy_id: int) -> bool:
+    db_vacancy = await get_vacancy_by_id(db, vacancy_id)
+    if not db_vacancy:
+        return False
+    
+    db_vacancy.is_active = not db_vacancy.is_active
+    await db.commit()
+    await db.refresh(db_vacancy)
+    
+    return True
+
 async def delete_vacancy(db: AsyncSession, vacancy_id: int) -> bool:
     db_vacancy = await get_vacancy_by_id(db, vacancy_id)
     if not db_vacancy:
