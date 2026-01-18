@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import desc, asc, or_, func
+from sqlalchemy import desc, asc, or_
 from sqlalchemy.orm import joinedload
 from typing import List, Optional, Tuple
 from models.vacancy import Vacancy, Response
@@ -45,7 +45,7 @@ async def toggle_vacancy_active(db: AsyncSession, vacancy_id: int) -> bool:
     await db.commit()
     await db.refresh(db_vacancy)
     
-    return True
+    return db_vacancy
 
 async def delete_vacancy(db: AsyncSession, vacancy_id: int) -> bool:
     db_vacancy = await get_vacancy_by_id(db, vacancy_id)

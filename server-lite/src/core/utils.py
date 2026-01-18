@@ -1,7 +1,7 @@
 import os
 from uuid import UUID
 from fastapi import UploadFile, HTTPException
-from config import config
+from ..config import config
 
 async def save_user_avatar(file: UploadFile, user_id: UUID):
     try:
