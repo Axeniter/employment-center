@@ -82,3 +82,6 @@ class ResponseResponse(ResponseBase):
 
     class Config:
         from_attributes = True
+
+class ResponseUpdate(BaseModel):
+    status: ResponseStatus

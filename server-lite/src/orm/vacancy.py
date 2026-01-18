@@ -5,7 +5,7 @@ from sqlalchemy.orm import joinedload
 from typing import List, Optional, Tuple
 from models.vacancy import Vacancy, Response
 from models.user import User
-from schemas.vacancy import VacancyCreate, VacancyUpdate, VacancySearch
+from schemas.vacancy import VacancyCreate, VacancyUpdate, VacancySearch, ResponseUpdate
 from uuid import UUID
 
 async def get_vacancy_by_id(db: AsyncSession, vacancy_id: int) -> Optional[Vacancy]:
@@ -86,12 +86,12 @@ async def get_responses_by_applicant(db: AsyncSession, applicant_id: UUID) -> Li
     )
     return list(result.scalars().all())
 
-async def update_response_status(db: AsyncSession, response_id: int, status: str) -> Optional[Response]:
+async def update_response_status(db: AsyncSession, response_id: int, update_data: ResponseUpdate) -> Optional[Response]:
     response = await get_response_by_id(db, response_id)
     if not response:
         return None
     
-    response.status = status
+    response.status = update_data.status
     await db.commit()
     await db.refresh(response)
     return response
