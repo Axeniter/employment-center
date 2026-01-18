@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from schemas.vacancy import VacancyResponse, VacancyCreate, VacancyUpdate, VacancySearch, ResponseResponse, ResponseCreate, ResponseUpdate
 from orm.vacancy import (create_vacancy, update_vacancy, get_vacancy_by_id, delete_vacancy, toggle_vacancy_active, create_response,
-                         get_responses_by_applicant, get_responses_by_vacancy, get_response_by_id, update_response_status)
+                         get_responses_by_applicant, get_responses_by_vacancy, get_response_by_id, update_response_status,
+                         get_vacancies_by_employer, search_vacancies)
 from core.database import get_db
 from core.dependencies import require_role, get_current_active_user
 from models.user import UserRole
@@ -10,6 +11,17 @@ from typing import List
 
 vacancy_router = APIRouter(prefix="/vacancies", tags=["vacancy"])
 response_router = APIRouter(prefix="/responses", tags=["response"])
+
+@vacancy_router.get("/me", response_model=List[VacancyResponse])
+async def get_my_vacancies_endpoint(user = Depends(require_role(UserRole.EMPLOYER)), db: AsyncSession = Depends(get_db)):
+    vacancies = await get_vacancies_by_employer(db, user.id)
+    return vacancies
+
+@vacancy_router.get("/", response_model=List[VacancyResponse])
+async def search_vacancies_endpoint(search_params: VacancySearch = Depends(), page: int = Query(1, ge=1),
+                                    limit: int = Query(20, ge=1, le=100), db: AsyncSession = Depends(get_db)):
+    vacancies = await search_vacancies(db, search_params, page, limit)
+    return vacancies
 
 @vacancy_router.post("/", response_model=VacancyResponse)
 async def create_vacancy_endpoint(vacancy_data: VacancyCreate, user = Depends(require_role(UserRole.EMPLOYER)),
