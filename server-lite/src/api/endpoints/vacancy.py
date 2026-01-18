@@ -8,6 +8,7 @@ from core.dependencies import require_role, get_current_active_user
 from models.user import UserRole
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
+from uuid import UUID
 
 vacancy_router = APIRouter(prefix="/vacancies", tags=["vacancy"])
 response_router = APIRouter(prefix="/responses", tags=["response"])
@@ -99,6 +100,11 @@ async def get_vacancy_by_id_endpoint(vacancy_id: int, db: AsyncSession = Depends
             detail="Vacancy not found"
         )
     return db_vacancy
+
+@vacancy_router.get("/employer/{employer_id}", response_model=List[VacancyResponse])
+async def get_vacancies_by_employer_endpoint(employer_id: UUID, db: AsyncSession = Depends(get_db)):
+    vacancies = await get_vacancies_by_employer(db, employer_id)
+    return vacancies
 
 @vacancy_router.post("/{vacancy_id}/responses", response_model=ResponseResponse)
 async def create_response_endpoint(vacancy_id: int, user = Depends(require_role(UserRole.APPLICANT)),
