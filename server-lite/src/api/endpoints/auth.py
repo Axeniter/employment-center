@@ -6,7 +6,6 @@ from core.database import get_db
 from core.security import (create_access_token, create_and_save_refresh_token, get_user_id_by_refresh_token,
                            delete_refresh_token)
 from orm.user import create_user, get_user_by_email, authenticate_user, get_user_by_id
-from core.dependencies import get_current_user
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 

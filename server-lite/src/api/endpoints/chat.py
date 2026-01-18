@@ -2,8 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query, WebSocket,
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional, Tuple
 from uuid import UUID
-import json
-
 from core.database import get_db
 from core.dependencies import get_current_active_user, require_role
 from orm.chat import (

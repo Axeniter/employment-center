@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List, Optional
+from typing import List
 from datetime import datetime
 from uuid import UUID
 from models.user import UserRole
 from core.database import get_db
-from core.dependencies import get_current_user, require_role
-from models.user import User
+from core.dependencies import require_role
 from schemas.event import EventCreate, EventUpdate, EventResponse, EventSearch
 from orm.event import (
     get_event_by_id,
@@ -14,7 +13,6 @@ from orm.event import (
     create_event,
     update_event,
     delete_event,
-    get_event_with_employer,
     search_events
 )
 

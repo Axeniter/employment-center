@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import desc, asc, or_
 from sqlalchemy.orm import joinedload
-from typing import List, Optional, Tuple
+from typing import List, Optional
 from models.vacancy import Vacancy, Response
 from models.user import User
 from schemas.vacancy import VacancyCreate, VacancyUpdate, VacancySearch, ResponseUpdate
