@@ -3,6 +3,7 @@ from typing import Optional, List
 from uuid import UUID
 from datetime import datetime
 import re
+from models.vacancy import ResponseStatus
 
 class VacancyBase(BaseModel):
     title: str
@@ -64,5 +65,20 @@ class VacancySearch(BaseModel):
             )
         return v
     
+    class Config:
+        from_attributes = True
+
+class ResponseBase(BaseModel):
+    vacancy_id: int
+
+class ResponseCreate(ResponseBase):
+    pass
+
+class ResponseResponse(ResponseBase):
+    id: int
+    applicant_id: UUID
+    status: ResponseStatus
+    created_at: datetime
+
     class Config:
         from_attributes = True
