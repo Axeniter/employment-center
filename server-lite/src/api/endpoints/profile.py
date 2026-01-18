@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile
+from fastapi.responses import FileResponse
 from typing import Union
 from schemas.profile import (ApplicantProfileResponse, EmployerProfileResponse, ApplicantProfileCreate, ApplicantProfileUpdate, 
                              EmployerProfileCreate, EmployerProfileUpdate)
@@ -9,8 +10,8 @@ from orm.profile import (get_profile_by_id, create_employer_profile, create_appl
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from models.user import UserRole
-from core.utils import save_user_avatar, delete_user_avatar
-from config import config
+from core.utils import save_user_avatar, delete_user_avatar, get_user_avatar_path
+import os
 
 profile_router = APIRouter(prefix="/profile", tags=["profile"])
 
@@ -71,3 +72,59 @@ async def update_employer_profile_endpoint(profile_data: EmployerProfileUpdate, 
             detail="Profile doesn't exists")
     updated_profile = await update_employer_profile(db, user.id, profile_data)
     return updated_profile
+
+@profile_router.post("/avatar", status_code=status.HTTP_200_OK)
+async def upload_avatar(file: UploadFile, user = Depends(get_current_active_user)):
+    try:
+        await save_user_avatar(file, user.id)
+        return {
+            "message": "Avatar uploaded successfully",
+            "user_id": str(user.id)
+        }
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to upload avatar: {str(e)}")
+    
+@profile_router.delete("/avatar", status_code=status.HTTP_200_OK)
+async def remove_avatar(user = Depends(get_current_active_user)):
+    try:
+        deleted = delete_user_avatar(user.id)
+        if deleted:
+            return {
+                "message": "Avatar deleted successfully",
+                "user_id": str(user.id)
+            }
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Avatar not found")
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to delete avatar: {str(e)}"
+        )
+
+@profile_router.get("/{user_id}/avatar")
+async def get_avatar(user_id: UUID):
+    avatar_path = get_user_avatar_path(user_id)
+    
+    if not avatar_path:
+        raise HTTPException(status_code=404, detail="Avatar not found")
+    
+    extension = os.path.splitext(avatar_path)[1].lower()
+    return FileResponse(avatar_path, media_type=f"image/{extension.lstrip('.')}")
+
+@profile_router.get("/me/avatar")
+async def get_my_avatar(user = Depends(get_current_active_user)):
+    avatar_path = get_user_avatar_path(user.id)
+    
+    if not avatar_path:
+        raise HTTPException(status_code=404, detail="Avatar not found")
+    
+    extension = os.path.splitext(avatar_path)[1].lower()
+    return FileResponse(avatar_path, media_type=f"image/{extension.lstrip('.')}")
