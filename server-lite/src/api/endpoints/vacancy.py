@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from schemas.vacancy import VacancyResponse, VacancyCreate, VacancyUpdate, VacancySearch, ResponseResponse, ResponseCreate, ResponseUpdate
+from schemas.vacancy import VacancyResponse, VacancyCreate, VacancyUpdate, VacancySearch, ResponseResponse, ResponseUpdate
 from orm.vacancy import (create_vacancy, update_vacancy, get_vacancy_by_id, delete_vacancy, toggle_vacancy_active, create_response,
                          get_responses_by_applicant, get_responses_by_vacancy, get_response_by_id, update_response_status,
                          get_vacancies_by_employer, search_vacancies)
