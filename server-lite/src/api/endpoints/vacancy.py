@@ -106,7 +106,7 @@ async def get_vacancies_by_employer_endpoint(employer_id: UUID, db: AsyncSession
     vacancies = await get_vacancies_by_employer(db, employer_id)
     return vacancies
 
-@vacancy_router.post("/{vacancy_id}/responses", response_model=ResponseResponse)
+@response_router.post("/vacancy/{vacancy_id}", response_model=ResponseResponse)
 async def create_response_endpoint(vacancy_id: int, user = Depends(require_role(UserRole.APPLICANT)),
                                    db: AsyncSession = Depends(get_db)):
     db_vacancy = await get_vacancy_by_id(db, vacancy_id)
@@ -134,7 +134,7 @@ async def create_response_endpoint(vacancy_id: int, user = Depends(require_role(
     response = await create_response(db, user.id, vacancy_id)
     return response
 
-@vacancy_router.get("/{vacancy_id}/responses", response_model=List[ResponseResponse])
+@response_router.get("/vacancy/{vacancy_id}", response_model=List[ResponseResponse])
 async def get_responses_by_vacancy_endpoint(vacancy_id: int, user = Depends(require_role(UserRole.EMPLOYER)),
                                             db: AsyncSession = Depends(get_db)):
     db_vacancy = await get_vacancy_by_id(db, vacancy_id)
