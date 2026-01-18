@@ -1,5 +1,5 @@
 from core.database import Base
-from sqlalchemy import Column, String, ForeignKey, DateTime, Text
+from sqlalchemy import Column, String, ForeignKey, Text, Date
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.orm import relationship
 from .user import UserRole
@@ -22,7 +22,7 @@ class ApplicantProfile(BaseProfile):
     last_name = Column(String(50), nullable=False)
     middle_name = Column(String(50), nullable=True)
     phone_number = Column(String(20), nullable=True)
-    birth_date = Column(DateTime, nullable=True)
+    birth_date = Column(Date, nullable=True)
     city = Column(String(50), nullable=True)
     about = Column(Text)
     skills = Column(ARRAY(String))

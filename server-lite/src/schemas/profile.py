@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from uuid import UUID
 from typing import Optional, List, Literal
-from datetime import datetime
+from datetime import date
 from models.user import UserRole
 
 class ProfileBase(BaseModel):
@@ -12,7 +12,7 @@ class ApplicantProfileCreate(ProfileBase):
     last_name: str
     middle_name: Optional[str] = None
     phone_number: Optional[str] = None
-    birth_date: Optional[datetime] = None
+    birth_date: Optional[date] = None
     city: Optional[str] = None
     about:  Optional[str] = None
     skills: List[str] = []
@@ -22,7 +22,7 @@ class ApplicantProfileUpdate(ProfileBase):
     last_name: Optional[str] = None
     middle_name: Optional[str] = None
     phone_number: Optional[str] = None
-    birth_date: Optional[datetime] = None
+    birth_date: Optional[date] = None
     city: Optional[str] = None
     about:  Optional[str] = None
     skills: Optional[List[str]] = None
@@ -44,7 +44,7 @@ class ApplicantProfileResponse(ProfileBase):
     last_name: str
     middle_name: str
     phone_number: str
-    birth_date: datetime
+    birth_date: date
     city: str
     about: str
     skills: List[str]
