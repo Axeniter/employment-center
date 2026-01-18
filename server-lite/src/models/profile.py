@@ -9,7 +9,6 @@ class BaseProfile(Base):
 
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"),
                      primary_key=True, index=True)
-    avatar_url = Column(String(500), nullable=True)
 
     @property
     def profile_type(self) -> UserRole:

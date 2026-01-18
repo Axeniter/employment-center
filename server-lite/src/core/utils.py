@@ -1,10 +1,9 @@
 import os
 from uuid import UUID
 from fastapi import UploadFile, HTTPException
-from typing import Optional
 from config import config
 
-async def save_upload_file(file: UploadFile, user_id: UUID) -> Optional[str]:
+async def save_user_avatar(file: UploadFile, user_id: UUID):
     try:
         if not file.filename:
             raise HTTPException(
@@ -26,28 +25,27 @@ async def save_upload_file(file: UploadFile, user_id: UUID) -> Optional[str]:
 
         filename = f"{user_id}{file_extension}"
         
-        user_dir = os.path.join(config.UPLOAD_DIR, str(user_id))
-        os.makedirs(user_dir, exist_ok=True)
+        os.makedirs(config.UPLOAD_DIR, exist_ok=True)
         
-        file_path = os.path.join(user_dir, filename)
+        file_path = os.path.join(config.UPLOAD_DIR, filename)
+        
         if os.path.exists(file_path):
             os.remove(file_path)
         
         with open(file_path, "wb") as buffer:
             content = await file.read()
             buffer.write(content)
-        
-        return f"/uploads/{user_id}/{filename}"
-    
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error saving file: {str(e)}")
 
-def delete_file(file_url: str):
+def delete_user_avatar(user_id: UUID):
     try:
-        if file_url.startswith("/uploads/"):
-            file_path = os.path.join(config.UPLOAD_DIR, file_url.replace("/uploads/", "", 1))
+        for extension in config.ALLOWED_EXTENSIONS:
+            filename = f"{user_id}{extension}"
+            file_path = os.path.join(config.UPLOAD_DIR, filename)
+            
             if os.path.exists(file_path):
                 os.remove(file_path)
                 return True

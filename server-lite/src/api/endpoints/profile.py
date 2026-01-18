@@ -9,7 +9,7 @@ from orm.profile import (get_profile_by_id, create_employer_profile, create_appl
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from models.user import UserRole
-from core.utils import save_upload_file, delete_file
+from core.utils import save_user_avatar, delete_user_avatar
 from config import config
 
 profile_router = APIRouter(prefix="/profile", tags=["profile"])
