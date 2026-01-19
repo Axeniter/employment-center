@@ -24,6 +24,11 @@ async def search_vacancies_endpoint(search_params: VacancySearch = Depends(), pa
     vacancies = await search_vacancies(db, search_params, page, limit)
     return vacancies
 
+@vacancy_router.get("/employer/{employer_id}", response_model=List[VacancyResponse])
+async def get_vacancies_by_employer_endpoint(employer_id: UUID, db: AsyncSession = Depends(get_db)):
+    vacancies = await get_vacancies_by_employer(db, employer_id)
+    return vacancies
+
 @vacancy_router.post("/", response_model=VacancyResponse)
 async def create_vacancy_endpoint(vacancy_data: VacancyCreate, user = Depends(require_role(UserRole.EMPLOYER)),
                                   db: AsyncSession = Depends(get_db)):
@@ -91,6 +96,11 @@ async def toggle_vacancy_active_endpoint(vacancy_id: int, user = Depends(require
     modified_vacancy = await toggle_vacancy_active(db, vacancy_id)
     return modified_vacancy
 
+@response_router.get("/me", response_model=List[ResponseResponse])
+async def get_my_responses(user = Depends(require_role(UserRole.APPLICANT)), db: AsyncSession = Depends(get_db)):
+    responses = await get_responses_by_applicant(db, user.id)
+    return responses
+
 @vacancy_router.get("/{vacancy_id}", response_model=VacancyResponse)
 async def get_vacancy_by_id_endpoint(vacancy_id: int, db: AsyncSession = Depends(get_db)):
     db_vacancy = await get_vacancy_by_id(db, vacancy_id)
@@ -100,11 +110,6 @@ async def get_vacancy_by_id_endpoint(vacancy_id: int, db: AsyncSession = Depends
             detail="Vacancy not found"
         )
     return db_vacancy
-
-@vacancy_router.get("/employer/{employer_id}", response_model=List[VacancyResponse])
-async def get_vacancies_by_employer_endpoint(employer_id: UUID, db: AsyncSession = Depends(get_db)):
-    vacancies = await get_vacancies_by_employer(db, employer_id)
-    return vacancies
 
 @response_router.post("/vacancy/{vacancy_id}", response_model=ResponseResponse)
 async def create_response_endpoint(vacancy_id: int, user = Depends(require_role(UserRole.APPLICANT)),
@@ -193,9 +198,3 @@ async def update_response_status_endpoint(response_id: int, status_update: Respo
     
     updated_response = await update_response_status(db, response_id, status_update)
     return updated_response
-
-
-@response_router.get("/me", response_model=List[ResponseResponse])
-async def get_my_responses(user = Depends(require_role(UserRole.APPLICANT)), db: AsyncSession = Depends(get_db)):
-    responses = await get_responses_by_applicant(db, user.id)
-    return responses

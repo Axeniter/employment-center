@@ -23,11 +23,31 @@ async def get_my_profile(user = Depends(get_current_active_user), db = Depends(g
     
     return profile
 
+@profile_router.get("/me/avatar")
+async def get_my_avatar(user = Depends(get_current_active_user)):
+    avatar_path = get_user_avatar_path(user.id)
+    
+    if not avatar_path:
+        raise HTTPException(status_code=404, detail="Avatar not found")
+    
+    extension = os.path.splitext(avatar_path)[1].lower()
+    return FileResponse(avatar_path, media_type=f"image/{extension.lstrip('.')}")
+
+@profile_router.get("/{user_id}/avatar")
+async def get_avatar(user_id: UUID):
+    avatar_path = get_user_avatar_path(user_id)
+    
+    if not avatar_path:
+        raise HTTPException(status_code=404, detail="Avatar not found")
+    
+    extension = os.path.splitext(avatar_path)[1].lower()
+    return FileResponse(avatar_path, media_type=f"image/{extension.lstrip('.')}")
+
 @profile_router.get("/{user_id}", response_model=Union[ApplicantProfileResponse, EmployerProfileResponse])
 async def get_profile(user_id: UUID, db = Depends(get_db)):
     profile = await get_profile_by_id(db, user_id)
     if not profile:
-        HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
 
     return profile
 
@@ -108,23 +128,3 @@ async def remove_avatar(user = Depends(get_current_active_user)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to delete avatar: {str(e)}"
         )
-
-@profile_router.get("/{user_id}/avatar")
-async def get_avatar(user_id: UUID):
-    avatar_path = get_user_avatar_path(user_id)
-    
-    if not avatar_path:
-        raise HTTPException(status_code=404, detail="Avatar not found")
-    
-    extension = os.path.splitext(avatar_path)[1].lower()
-    return FileResponse(avatar_path, media_type=f"image/{extension.lstrip('.')}")
-
-@profile_router.get("/me/avatar")
-async def get_my_avatar(user = Depends(get_current_active_user)):
-    avatar_path = get_user_avatar_path(user.id)
-    
-    if not avatar_path:
-        raise HTTPException(status_code=404, detail="Avatar not found")
-    
-    extension = os.path.splitext(avatar_path)[1].lower()
-    return FileResponse(avatar_path, media_type=f"image/{extension.lstrip('.')}")
