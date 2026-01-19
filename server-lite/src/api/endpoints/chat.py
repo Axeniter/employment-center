@@ -78,6 +78,23 @@ async def get_conversation(other_user_id: UUID, skip: int = Query(0, ge=0, descr
     messages = await get_conversation_messages(db, user.id, other_user_id, skip, limit)
     return messages
 
+@chat_router.get("/message/{message_id}", response_model=MessageResponse)
+async def get_message(message_id: int, user: User = Depends(get_current_active_user),
+                      db: AsyncSession = Depends(get_db)):
+    message = await get_message_by_id(db, message_id)
+    if not message:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Message not found"
+        )
+    
+    if user.id not in [message.sender_id, message.receiver_id]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have permission to view this message")
+    
+    return message
+
 @chat_router.post("/message", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
 async def send_message(message: MessageCreate, user = Depends(get_current_active_user), db: AsyncSession = Depends(get_db)):
     if user.id == message.receiver_id:
@@ -98,20 +115,3 @@ async def send_message(message: MessageCreate, user = Depends(get_current_active
     await manager.send_personal_message(websocket_message, message.receiver_id)
     
     return created_message
-
-@chat_router.get("/message/{message_id}", response_model=MessageResponse)
-async def get_message(message_id: int, user: User = Depends(get_current_active_user),
-                      db: AsyncSession = Depends(get_db)):
-    message = await get_message_by_id(db, message_id)
-    if not message:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Message not found"
-        )
-    
-    if user.id not in [message.sender_id, message.receiver_id]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You don't have permission to view this message")
-    
-    return message

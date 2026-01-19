@@ -73,6 +73,21 @@ async def create_employer_profile_endpoint(profile_data: EmployerProfileCreate, 
     new_profile = await create_employer_profile(db, user.id, profile_data)
     return new_profile
 
+@profile_router.post("/avatar", status_code=status.HTTP_200_OK)
+async def upload_avatar(file: UploadFile, user = Depends(get_current_active_user)):
+    try:
+        await save_user_avatar(file, user.id)
+        return {
+            "message": "Avatar uploaded successfully",
+            "user_id": str(user.id)
+        }
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to upload avatar: {str(e)}")
+
 @profile_router.put("/applicant", response_model=ApplicantProfileResponse)
 async def update_applicant_profile_endpoint(profile_data: ApplicantProfileUpdate, user = Depends(require_role(UserRole.APPLICANT)),
                                             db: AsyncSession = Depends(get_db)):
@@ -92,21 +107,6 @@ async def update_employer_profile_endpoint(profile_data: EmployerProfileUpdate, 
             detail="Profile doesn't exists")
     updated_profile = await update_employer_profile(db, user.id, profile_data)
     return updated_profile
-
-@profile_router.post("/avatar", status_code=status.HTTP_200_OK)
-async def upload_avatar(file: UploadFile, user = Depends(get_current_active_user)):
-    try:
-        await save_user_avatar(file, user.id)
-        return {
-            "message": "Avatar uploaded successfully",
-            "user_id": str(user.id)
-        }
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to upload avatar: {str(e)}")
     
 @profile_router.delete("/avatar", status_code=status.HTTP_200_OK)
 async def remove_avatar(user = Depends(get_current_active_user)):

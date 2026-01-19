@@ -24,6 +24,19 @@ async def search_events_endpoint(search_params: EventSearch = Depends(), page: i
     events = await search_events(db, search_params, page, limit)
     return events
 
+
+@event_router.get("/me", response_model=List[EventResponse])
+async def get_my_events_endpoint(user = Depends(require_role(UserRole.EMPLOYER)), db: AsyncSession = Depends(get_db)):
+    events = await get_events_by_employer(db, user.id)
+    return events
+
+
+@event_router.get("/employer/{employer_id}", response_model=List[EventResponse])
+async def get_events_by_employer_endpoint(employer_id: UUID, db: AsyncSession = Depends(get_db)):
+    events = await get_events_by_employer(db, employer_id)
+    return events
+
+
 @event_router.get("/{event_id}", response_model=EventResponse)
 async def get_event_by_id_endpoint(event_id: int, db: AsyncSession = Depends(get_db)):
     db_event = await get_event_by_id(db, event_id)
@@ -32,15 +45,6 @@ async def get_event_by_id_endpoint(event_id: int, db: AsyncSession = Depends(get
     
     return db_event
 
-@event_router.get("/me", response_model=List[EventResponse])
-async def get_my_events_endpoint(user = Depends(require_role(UserRole.EMPLOYER)), db: AsyncSession = Depends(get_db)):
-    events = await get_events_by_employer(db, user.id)
-    return events
-
-@event_router.get("/employer/{employer_id}", response_model=List[EventResponse])
-async def get_events_by_employer_endpoint(employer_id: UUID, db: AsyncSession = Depends(get_db)):
-    events = await get_events_by_employer(db, employer_id)
-    return events
 
 @event_router.post("/", response_model=EventResponse)
 async def create_event_endpoint(event_data: EventCreate, user = Depends(require_role(UserRole.EMPLOYER)),
