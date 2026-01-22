@@ -20,6 +20,7 @@ namespace EmploymentApp
     		builder.Logging.AddDebug();
 #endif
             builder.Services.AddTransient<LoginViewModel>();
+            builder.Services.AddTransient<RegistrationViewModel>();
 
             return builder.Build();
         }
