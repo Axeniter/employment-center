@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using EmploymentApp.Viewmodels;
+using Microsoft.Extensions.Logging;
 
 namespace EmploymentApp
 {
@@ -18,6 +19,7 @@ namespace EmploymentApp
 #if DEBUG
     		builder.Logging.AddDebug();
 #endif
+            builder.Services.AddTransient<LoginViewModel>();
 
             return builder.Build();
         }
