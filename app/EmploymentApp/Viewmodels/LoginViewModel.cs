@@ -11,7 +11,7 @@ namespace EmploymentApp.Viewmodels
     public partial class LoginViewModel : ObservableObject
     {
         [ObservableProperty]
-        private string email;
+        private string email; 
 
         [ObservableProperty]
         private string password;
