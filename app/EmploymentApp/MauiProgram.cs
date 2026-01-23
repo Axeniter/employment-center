@@ -1,4 +1,6 @@
 ﻿using EmploymentApp.Viewmodels;
+using EmploymentApp.Pages;
+using EmploymentApp.Services;
 using Microsoft.Extensions.Logging;
 
 namespace EmploymentApp
@@ -22,6 +24,14 @@ namespace EmploymentApp
             builder.Services.AddTransient<LoginViewModel>();
             builder.Services.AddTransient<RegistrationViewModel>();
             builder.Services.AddTransient<EmployerViewModel>();
+            builder.Services.AddTransient<ApplicantViewModel>();
+
+            builder.Services.AddTransient<LoginPage>();
+            builder.Services.AddTransient<RegistrationPage>();
+            builder.Services.AddTransient<EmployerPage>();
+            builder.Services.AddTransient<ApplicantPage>();
+
+            builder.Services.AddSingleton<AuthService>();
 
             return builder.Build();
         }

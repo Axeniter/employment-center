@@ -8,5 +8,6 @@ namespace EmploymentApp.Viewmodels
 {
     class ApplicantViewModel
     {
+
     }
 }

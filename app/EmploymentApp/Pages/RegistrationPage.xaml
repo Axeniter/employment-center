@@ -163,7 +163,7 @@
                        HorizontalOptions="Start">
                     
                     <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding LoginTappedCommand}"/>
+                        <TapGestureRecognizer Command="{Binding NavigateToLoginCommand}"/>
                     </Label.GestureRecognizers>
                     
                 </Label>

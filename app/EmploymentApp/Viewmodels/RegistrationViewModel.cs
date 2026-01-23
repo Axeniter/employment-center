@@ -1,94 +1,182 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using EmploymentApp.Services;
 using Microsoft.Maui.Controls;
+using System.Diagnostics;
 
-namespace EmploymentApp.Viewmodels;
-
-public partial class RegistrationViewModel : ObservableObject
+namespace EmploymentApp.Viewmodels
 {
-    [ObservableProperty]
-    private string email;
-
-    [ObservableProperty]
-    private string password;
-
-    [ObservableProperty]
-    private string confirmPassword;
-
-    [ObservableProperty]
-    private bool isEmployerSelected;
-
-    [ObservableProperty]
-    private Color applicantColor = Color.FromArgb("#9dfca8");
-
-    [ObservableProperty]
-    private Color employerColor = Color.FromArgb("#e0e0e0");
-
-    public RegistrationViewModel()
+    public partial class RegistrationViewModel : ObservableObject
     {
-        UpdateColors();  // Инициализация цветов
-    }
+        private readonly AuthService _authService;
 
-    partial void OnIsEmployerSelectedChanged(bool value)
-    {
-        UpdateColors();
-    }
+        [ObservableProperty]
+        private string email = "";
 
-    private void UpdateColors()
-    {
-        ApplicantColor = IsEmployerSelected ? Color.FromArgb("#e0e0e0") : Color.FromArgb("#9dfca8");
-        EmployerColor = IsEmployerSelected ? Color.FromArgb("#9dfca8") : Color.FromArgb("#e0e0e0");
-    }
+        [ObservableProperty]
+        private string password = "";
 
-    [RelayCommand]
-    private void ApplicantTapped()
-    {
-        IsEmployerSelected = false;
-    }
+        [ObservableProperty]
+        private string confirmPassword = "";
 
-    [RelayCommand]
-    private void EmployerTapped()
-    {
-        IsEmployerSelected = true;
-    }
+        [ObservableProperty]
+        private bool isEmployerSelected = false;
 
-    [RelayCommand]
-    private async Task LoginTapped()
-    {
-        await Shell.Current.GoToAsync("//LoginPage");
-    }
+        [ObservableProperty]
+        private Color applicantColor = Color.FromArgb("#9dfca8");
 
-    [RelayCommand]
-    private async Task RegisterTapped()
-    {
-        if (string.IsNullOrWhiteSpace(Email))
+        [ObservableProperty]
+        private Color employerColor = Color.FromArgb("#e0e0e0");
+
+        public RegistrationViewModel(AuthService authService)
         {
-            await Application.Current.MainPage.DisplayAlert("Ошибка", "Введите почту", "OK");
-            return;
+            _authService = authService;
+            UpdateColors();
         }
 
-        if (string.IsNullOrWhiteSpace(Password))
+        partial void OnIsEmployerSelectedChanged(bool value)
         {
-            await Application.Current.MainPage.DisplayAlert("Ошибка", "Введите пароль", "OK");
-            return;
+            UpdateColors();
         }
 
-        if (Password != ConfirmPassword)
+        private void UpdateColors()
         {
-            await Application.Current.MainPage.DisplayAlert("Ошибка", "Пароли не совпадают", "OK");
-            Password = "";
-            ConfirmPassword = "";
-            return;
+            ApplicantColor = IsEmployerSelected
+                ? Color.FromArgb("#e0e0e0")
+                : Color.FromArgb("#9dfca8");
+
+            EmployerColor = IsEmployerSelected
+                ? Color.FromArgb("#9dfca8")
+                : Color.FromArgb("#e0e0e0");
         }
 
-        if (Password.Length < 8)
+        [RelayCommand]
+        private void ApplicantTapped()
         {
-            await Application.Current.MainPage.DisplayAlert("Ошибка", "Длина пароля меньше 8 символов", "OK");
-            Password = "";
-            return;
+            IsEmployerSelected = false;
         }
 
-        await Application.Current.MainPage.DisplayAlert("Успех", "Аккаунт создан", "OK");
-        // TODO: API регистрация
+        [RelayCommand]
+        private void EmployerTapped()
+        {
+            IsEmployerSelected = true;
+        }
+
+        [RelayCommand]
+        private async Task RegisterTapped()
+        {
+            if (string.IsNullOrWhiteSpace(Email))
+            {
+                await Application.Current.MainPage.DisplayAlert(
+                    "Ошибка",
+                    "Введите email",
+                    "OK"
+                );
+                return;
+            }
+
+            if (!Email.Contains("@") || !Email.Contains("."))
+            {
+                await Application.Current.MainPage.DisplayAlert(
+                    "Ошибка",
+                    "Введите корректный email",
+                    "OK"
+                );
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(Password))
+            {
+                await Application.Current.MainPage.DisplayAlert(
+                    "Ошибка",
+                    "Введите пароль",
+                    "OK"
+                );
+                return;
+            }
+
+            if (Password.Length < 8)
+            {
+                await Application.Current.MainPage.DisplayAlert(
+                    "Ошибка",
+                    "Пароль должен быть минимум 8 символов",
+                    "OK"
+                );
+                Password = "";
+                ConfirmPassword = "";
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(ConfirmPassword))
+            {
+                await Application.Current.MainPage.DisplayAlert(
+                    "Ошибка",
+                    "Подтвердите пароль",
+                    "OK"
+                );
+                return;
+            }
+
+            if (Password != ConfirmPassword)
+            {
+                await Application.Current.MainPage.DisplayAlert(
+                    "Ошибка",
+                    "Пароли не совпадают",
+                    "OK"
+                );
+                Password = "";
+                ConfirmPassword = "";
+                return;
+            }
+
+            var role = IsEmployerSelected ? "employer" : "applicant";
+
+            try
+            {
+                var (success, userId) = await _authService.RegisterAsync(
+                    Email,
+                    Password,
+                    role
+                );
+
+                if (success)
+                {
+                    await Application.Current.MainPage.DisplayAlert(
+                        "Успех",
+                        "Аккаунт создан успешно!",
+                        "OK"
+                    );
+
+                    Email = "";
+                    Password = "";
+                    ConfirmPassword = "";
+                    IsEmployerSelected = false;
+                }
+                else
+                {
+                    await Application.Current.MainPage.DisplayAlert(
+                        "Ошибка регистрации",
+                        "Не удалось создать аккаунт. Возможно, email уже зарегистрирован.",
+                        "OK"
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Registration error: {ex.Message}");
+
+                await Application.Current.MainPage.DisplayAlert(
+                    "Ошибка",
+                    $"Ошибка подключения: {ex.Message}",
+                    "OK"
+                );
+            }
+        }
+
+        [RelayCommand]
+        private async Task NavigateToLogin()
+        {
+            await Shell.Current.GoToAsync("//LoginPage");
+        }
     }
 }
