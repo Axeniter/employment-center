@@ -93,7 +93,7 @@
 
                 <!-- Ссылка "нет аккаунта?" -->
                 <Label x:Name="RegisterLabel"
-                       Text="нет аккаунта?"
+                       Text="Нет аккаунта? Регистрация"
                        FontSize="14"
                        TextColor="Black"
                        HorizontalOptions="Start">

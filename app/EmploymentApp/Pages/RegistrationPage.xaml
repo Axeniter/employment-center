@@ -158,7 +158,7 @@
                 </VerticalStackLayout>
 
                 <!-- Ссылка на логин -->
-                <Label Text="есть аккаунт? войти" 
+                <Label Text="Есть аккаунт? Войти" 
                        FontSize="14" TextColor="Black" 
                        HorizontalOptions="Start">
                     
