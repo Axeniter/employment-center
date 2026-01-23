@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="EmploymentApp.Pages.ApplicantPage"
+             xmlns:models="clr-namespace:EmploymentApp.Models"
+             Title="ApplicantPage">
+
+    <ScrollView>
+        <VerticalStackLayout>
+            <Grid HeightRequest="40"
+                  BackgroundColor="#9dfca8">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Text="Вакансии"
+                        Grid.Column="0"
+                        BackgroundColor="Transparent"
+                        TextColor="Black"
+                        FontSize="16"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center"/>
+
+                <Label Text="Coбытия"
+                       Grid.Column="1"
+                       BackgroundColor="Transparent"
+                       TextColor="Black"
+                       FontSize="16"
+                       VerticalOptions="Center"
+                       HorizontalOptions="Start"/>
+
+                <Label Text="Чат"
+                       Grid.Column="3"
+                       BackgroundColor="Transparent"
+                       TextColor="Black"
+                       FontSize="16"
+                       VerticalOptions="Center"
+                       HorizontalOptions="End"/>
+
+                <Label Text="Профиль"
+                       Grid.Column="4"
+                       BackgroundColor="Transparent"
+                       TextColor="Black"
+                       FontSize="16"
+                       VerticalOptions="Center"
+                       HorizontalOptions="Center"/>
+
+            </Grid>
+
+            <Grid RowDefinitions="*, Auto, Auto, Auto" 
+                  ColumnDefinitions="Auto, *"
+                  Padding="60,40,40,20" 
+                  RowSpacing="30"
+                  ColumnSpacing="40">
+
+                <!-- Аватарка -->
+                <Border Grid.Column="0"
+                        Grid.Row="0"
+                        StrokeShape="RoundRectangle 100"
+                        StrokeThickness="2"
+                        Stroke="#333333" 
+                        HeightRequest="204" 
+                        WidthRequest="204"
+                        HorizontalOptions="Start"
+                        VerticalOptions="Start"
+                        Margin="0,20,0,0">
+                    <!-- Отступ сверху -->
+
+                    <Image Source="dotnet_bot.png"
+                           Aspect="AspectFill"
+                           HeightRequest="200"
+                           WidthRequest="200"/>
+
+                </Border>
+
+                <!-- Поле с именем и возрастом -->
+                <VerticalStackLayout Grid.Column="1"
+                         Grid.Row="0"
+                         VerticalOptions="Start"
+                         Spacing="10">
+
+                    <Label Text="Имя:"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="Black"/>
+
+                    <Label Text="Максим"
+                           FontSize="20"
+                           TextColor="#212121"/>
+
+                    <Label Text="Возраст"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="Black"/>
+
+                    <Label Text="+78005553535"
+                           FontSize="20"
+                           TextColor="#212121"/>
+
+                    <Label Text="Город:"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="Black"/>
+
+                    <Label Text="Владивосток"
+                           FontSize="20"
+                           TextColor="#212121"/>
+
+                    <Label Text="Контактная инофрмация"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="Black"/>
+
+                    <Label Text="+78005553535"
+                           FontSize="20"
+                           TextColor="#212121"/>
+                    
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Spacing="10">
+                    <Label Text="О себе:"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="Black"/>
+
+                    <Label Text="Я очень умный. Просто мега мозг. Самый генитальный человек в мире"
+                           FontSize="20"
+                           TextColor="#212121"/>
+
+                </VerticalStackLayout>
+
+            </Grid>
+
+        </VerticalStackLayout>
+
+    </ScrollView>
+
+</ContentPage>

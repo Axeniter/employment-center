@@ -8,6 +8,11 @@
     Title="EmploymentApp">
 
     <ShellContent
+        Title="ApplicantPage"
+        ContentTemplate="{DataTemplate pages:ApplicantPage}"
+        Route="ApplicantPage"/>
+
+    <ShellContent
         Title="EmployerPage"
         ContentTemplate="{DataTemplate pages:EmployerPage}"
         Route="EmployerPage"/>
