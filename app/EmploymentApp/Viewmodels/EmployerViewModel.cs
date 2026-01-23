@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
+using EmploymentApp.Models;
 
 namespace EmploymentApp.Viewmodels
 {
@@ -12,6 +14,12 @@ namespace EmploymentApp.Viewmodels
     {
         [ObservableProperty]
         private bool isVacancySelected;
+
+        [ObservableProperty]
+        private ObservableCollection<Event> eventCollection;
+
+        [ObservableProperty]
+        private ObservableCollection<Vacancy> vacancyCollection;
 
         [ObservableProperty]
         private Color eventColor = Color.FromArgb("#9dfca8");
