@@ -21,6 +21,7 @@ namespace EmploymentApp
 #endif
             builder.Services.AddTransient<LoginViewModel>();
             builder.Services.AddTransient<RegistrationViewModel>();
+            builder.Services.AddTransient<EmployerViewModel>();
 
             return builder.Build();
         }

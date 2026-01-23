@@ -114,10 +114,59 @@
                            TextColor="#212121"/>
 
                 </VerticalStackLayout>
+                
+                <VerticalStackLayout Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Spacing="10">
+                    <Grid ColumnDefinitions="*,*" 
+                          ColumnSpacing="10">
 
+                        <Border BackgroundColor="{Binding EventColor}"
+                                Stroke="Transparent" 
+                                StrokeThickness="0"
+                                HeightRequest="50" 
+                                HorizontalOptions="Fill" 
+                                Padding="0">
+
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10"/>
+                            </Border.StrokeShape>
+
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding EventTappedCommand}"/>
+                            </Border.GestureRecognizers>
+
+                            <Label Text="События" 
+                                   FontSize="16" 
+                                   HorizontalOptions="Center" 
+                                   VerticalOptions="Center" 
+                                   TextColor="Black"/>
+                        </Border>
+
+                        <Border Grid.Column="1" 
+                                BackgroundColor="{Binding VacancyColor}"
+                                Stroke="Transparent" 
+                                StrokeThickness="0"
+                                HeightRequest="50" 
+                                HorizontalOptions="Fill" 
+                                Padding="0">
+
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10"/>
+                            </Border.StrokeShape>
+
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding VacancyTappedCommand}"/>
+                            </Border.GestureRecognizers>
+
+                            <Label Text="Вакансии" FontSize="16" 
+                                   HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
+                        </Border>
+                    </Grid>
+                </VerticalStackLayout>
+                
             </Grid>
 
         </VerticalStackLayout>
+        
     </ScrollView>
     
 </ContentPage>
