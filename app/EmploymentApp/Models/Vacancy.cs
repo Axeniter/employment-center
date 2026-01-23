@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EmploymentApp.Models
 {
-    class Vacancy
+    public class Vacancy
     {
         public int Id { get; set; }
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EmploymentApp.Models
 {
-    class Event
+    public class Event
     {
         public int Id { get; set; }
 
