@@ -27,4 +27,14 @@
         ContentTemplate="{DataTemplate pages:RegistrationPage}"
         Route="RegistrationPage" />
 
+    <ShellContent
+        Title="ApplicantCreateProfilePage"
+        ContentTemplate="{DataTemplate pages:ApplicantCreateProfilePage}"
+        Route="ApplicantCreateProfilePage" />
+
+    <ShellContent
+        Title="EmployerCreateProfilePage"
+        ContentTemplate="{DataTemplate pages:EmployerCreateProfilePage}"
+        Route="EmployerCreateProfilePage" />
+
 </Shell>
