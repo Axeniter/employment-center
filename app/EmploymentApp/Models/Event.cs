@@ -24,11 +24,9 @@ namespace EmploymentApp.Models
 
         public int EmployerId { get; set; }
 
-        // Вычисляемое свойство для форматированной даты
         public string FormattedDate =>
             Date.ToString("dd MMMM yyyy, HH:mm", new System.Globalization.CultureInfo("ru-RU"));
 
-        // Вычисляемое свойство для места проведения
         public string EventLocation =>
             IsRemote ? "Онлайн" : Location;
 

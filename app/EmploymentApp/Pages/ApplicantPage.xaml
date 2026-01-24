@@ -69,7 +69,6 @@
                         HorizontalOptions="Start"
                         VerticalOptions="Start"
                         Margin="0,20,0,0">
-                    <!-- Отступ сверху -->
 
                     <Image Source="dotnet_bot.png"
                            Aspect="AspectFill"
@@ -128,7 +127,7 @@
                            FontAttributes="Bold"
                            TextColor="Black"/>
 
-                    <Label Text="Я очень умный. Просто мега мозг. Самый генитальный человек в мире"
+                    <Label Text="Я очень умный. Мне 19 с хвостиком."
                            FontSize="20"
                            TextColor="#212121"/>
 

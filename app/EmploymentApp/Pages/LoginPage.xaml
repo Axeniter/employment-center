@@ -5,7 +5,7 @@
              Title="LoginPage">
 
     <Grid BackgroundColor="#F5F5F7">
-        <!-- Серая карточка через Border -->
+        <!-- Серая карточка -->
         <Border Stroke="Transparent"
                BackgroundColor="#f0f0f0"
                StrokeThickness="0"
@@ -105,7 +105,7 @@
                     </Label.GestureRecognizers>
                 </Label>
 
-                <!-- Кнопка ВОЙТИ -->
+                <!-- Кнопка войти -->
                 <Button x:Name="LoginButton"
                         Text="ВОЙТИ"
                         BackgroundColor="#9dfca8"

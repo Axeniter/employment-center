@@ -2,10 +2,10 @@
 using System.Diagnostics;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace EmploymentApp.Services
 {
-
     public class LoginRequest
     {
         [JsonPropertyName("email")]
@@ -45,13 +45,11 @@ namespace EmploymentApp.Services
         public string RefreshToken { get; set; }
     }
 
-
     public class AuthService : IDisposable
     {
         private readonly HttpClient _httpClient;
         private const string BaseUrl = "http://localhost:8000/api";
 
-        // КЛЮЧИ для SecureStorage - все хранится безопасно
         private const string TokenKey = "access_token";
         private const string RefreshTokenKey = "refresh_token";
         private const string UserIdKey = "user_id";
@@ -68,9 +66,6 @@ namespace EmploymentApp.Services
             };
         }
 
-        /// <summary>
-        /// Регистрация нового пользователя
-        /// </summary>
         public async Task<(bool success, string userId)> RegisterAsync(
             string email,
             string password,
@@ -107,9 +102,6 @@ namespace EmploymentApp.Services
             }
         }
 
-        /// <summary>
-        /// Вход пользователя с сохранением ID и Role
-        /// </summary>
         public async Task<LoginResult> LoginAsync(string email, string password)
         {
             try
@@ -131,12 +123,13 @@ namespace EmploymentApp.Services
                     await SaveTokensAsync(result);
                     AuthenticationChanged?.Invoke(this, true);
 
-                    // Возвращаем все нужные данные
+                    var role = ExtractRoleFromToken(result.AccessToken);
+
                     return new LoginResult
                     {
                         Success = true,
                         UserId = result.Id,
-                        Role = result.Role,
+                        Role = role,
                         Email = result.Email
                     };
                 }
@@ -150,36 +143,24 @@ namespace EmploymentApp.Services
             }
         }
 
-        /// <summary>
-        /// Получить access token
-        /// </summary>
         public async Task<string> GetAccessTokenAsync()
         {
             var token = await SecureStorage.GetAsync(TokenKey);
             return token ?? string.Empty;
         }
 
-        /// <summary>
-        /// Получить ID пользователя
-        /// </summary>
         public async Task<string> GetUserIdAsync()
         {
             var userId = await SecureStorage.GetAsync(UserIdKey);
             return userId ?? string.Empty;
         }
 
-        /// <summary>
-        /// Получить Role пользователя (applicant или employer)
-        /// </summary>
         public async Task<string> GetUserRoleAsync()
         {
             var role = await SecureStorage.GetAsync(UserRoleKey);
             return role ?? string.Empty;
         }
 
-        /// <summary>
-        /// Получить ВСЕ данные пользователя сразу
-        /// </summary>
         public async Task<UserAuthData> GetUserDataAsync()
         {
             return new UserAuthData
@@ -191,18 +172,12 @@ namespace EmploymentApp.Services
             };
         }
 
-        /// <summary>
-        /// Проверить, авторизован ли пользователь
-        /// </summary>
         public async Task<bool> IsAuthenticatedAsync()
         {
             var token = await SecureStorage.GetAsync(TokenKey);
             return !string.IsNullOrEmpty(token);
         }
 
-        /// <summary>
-        /// Выход (удаление всех данных из SecureStorage)
-        /// </summary>
         public async Task LogoutAsync()
         {
             try
@@ -220,44 +195,66 @@ namespace EmploymentApp.Services
             }
         }
 
-        /// <summary>
-        /// Сохранить токены, ID и Role в безопасное хранилище
-        /// </summary>
         private async Task SaveTokensAsync(AuthResponse response)
         {
             try
             {
-                // Сохраняем ACCESS TOKEN
                 if (response?.AccessToken != null)
                 {
                     await SecureStorage.SetAsync(TokenKey, response.AccessToken);
-                    Debug.WriteLine("Access token сохранён");
+                    Debug.WriteLine("Access token saved");
                 }
 
-                // Сохраняем REFRESH TOKEN
                 if (response?.RefreshToken != null)
                 {
                     await SecureStorage.SetAsync(RefreshTokenKey, response.RefreshToken);
-                    Debug.WriteLine("Refresh token сохранён");
+                    Debug.WriteLine("Refresh token saved");
                 }
 
-                // Сохраняем USER ID 
                 if (response?.Id != null)
                 {
                     await SecureStorage.SetAsync(UserIdKey, response.Id);
-                    Debug.WriteLine($"User ID сохранён: {response.Id}");
+                    Debug.WriteLine($"User ID saved: {response.Id}");
                 }
 
-                // Сохраняем ROLE 
-                if (response?.Role != null)
+                var roleFromToken = ExtractRoleFromToken(response.AccessToken);
+                if (!string.IsNullOrEmpty(roleFromToken))
                 {
-                    await SecureStorage.SetAsync(UserRoleKey, response.Role);
-                    Debug.WriteLine($"User role сохранён: {response.Role}");
+                    await SecureStorage.SetAsync(UserRoleKey, roleFromToken);
+                    Debug.WriteLine($"User role saved from token: {roleFromToken}");
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error saving tokens: {ex.Message}");
+            }
+        }
+
+        private string ExtractRoleFromToken(string token)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(token))
+                    return string.Empty;
+
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+
+                var roleClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "role");
+
+                if (roleClaim != null)
+                {
+                    Debug.WriteLine($"Role extracted from token: {roleClaim.Value}");
+                    return roleClaim.Value;
+                }
+
+                Debug.WriteLine("Role claim not found in token");
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error extracting role from token: {ex.Message}");
+                return string.Empty;
             }
         }
 
@@ -267,11 +264,6 @@ namespace EmploymentApp.Services
         }
     }
 
-    // ============== ВСПОМОГАТЕЛЬНЫЕ КЛАССЫ ==============
-
-    /// <summary>
-    /// Результат входа с ID и Role
-    /// </summary>
     public class LoginResult
     {
         public bool Success { get; set; }
@@ -280,9 +272,6 @@ namespace EmploymentApp.Services
         public string Email { get; set; }
     }
 
-    /// <summary>
-    /// Все данные аутентифицированного пользователя
-    /// </summary>
     public class UserAuthData
     {
         public string UserId { get; set; }

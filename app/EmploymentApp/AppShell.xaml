@@ -8,18 +8,22 @@
     Title="EmploymentApp">
     
     <ShellContent
+        Title="Login page"
         ContentTemplate="{DataTemplate pages:LoginPage}"
         Route="LoginPage" />
     
     <ShellContent
+        Title="Applicant page"
         ContentTemplate="{DataTemplate pages:ApplicantPage}"
         Route="ApplicantPage"/>
 
     <ShellContent
+        Title="Employer page"
         ContentTemplate="{DataTemplate pages:EmployerPage}"
         Route="EmployerPage"/>
 
     <ShellContent
+        Title="Registration page"
         ContentTemplate="{DataTemplate pages:RegistrationPage}"
         Route="RegistrationPage" />
 

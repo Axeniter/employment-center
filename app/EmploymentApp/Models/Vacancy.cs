@@ -30,11 +30,9 @@ namespace EmploymentApp.Models
 
         public int EmployerId { get; set; }
 
-        // Вычисляемое свойство для отображения диапазона зарплаты
         public string SalaryRange =>
             $"{SalaryFrom:N0} — {SalaryTo:N0} {SalaryCurrency}";
 
-        // Вычисляемое свойство для места работы
         public string WorkLocation =>
             IsRemote ? "Удаленно" : Location;
 
