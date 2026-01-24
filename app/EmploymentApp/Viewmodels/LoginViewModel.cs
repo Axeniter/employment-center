@@ -85,5 +85,34 @@ namespace EmploymentApp.Viewmodels
         {
             await Shell.Current.GoToAsync("//RegistrationPage");
         }
+
+        private async Task<bool> CheckProfileExist()
+        {
+            try
+            {
+                var token = await _authService.GetAccessTokenAsync();
+
+                if (string.IsNullOrEmpty(token))
+                    return false;
+
+                var response = await _apiClient.GetAsync("/profile/me", token); //Добавить апи сервис и разкоментить остальные файлы!
+
+                if (response.IsSuccessStatusCode)
+                    return true;
+
+                var content = await response.Content.ReadAsStringAsync();
+
+                if (content.Contains("Profile doesn't exist"))
+                    return false;
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"CheckProfileExist error: {ex.Message}");
+                return false;
+            }
+        }
+
     }
 }
