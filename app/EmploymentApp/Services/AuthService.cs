@@ -124,13 +124,13 @@ namespace EmploymentApp.Services
                     AuthenticationChanged?.Invoke(this, true);
 
                     var role = ExtractRoleFromToken(result.AccessToken);
+                    var userId = ExtractUserIdFromToken(result.AccessToken);
 
                     return new LoginResult
                     {
                         Success = true,
-                        UserId = result.Id,
-                        Role = role,
-                        Email = result.Email
+                        UserId = userId,
+                        Role = role
                     };
                 }
 
@@ -211,17 +211,18 @@ namespace EmploymentApp.Services
                     Debug.WriteLine("Refresh token saved");
                 }
 
-                if (response?.Id != null)
-                {
-                    await SecureStorage.SetAsync(UserIdKey, response.Id);
-                    Debug.WriteLine($"User ID saved: {response.Id}");
-                }
-
                 var roleFromToken = ExtractRoleFromToken(response.AccessToken);
                 if (!string.IsNullOrEmpty(roleFromToken))
                 {
                     await SecureStorage.SetAsync(UserRoleKey, roleFromToken);
                     Debug.WriteLine($"User role saved from token: {roleFromToken}");
+                }
+
+                var userIdFromToken = ExtractUserIdFromToken(response.AccessToken);
+                if (!string.IsNullOrEmpty(userIdFromToken))
+                {
+                    await SecureStorage.SetAsync(UserIdKey, userIdFromToken);
+                    Debug.WriteLine($"User role saved from token: {userIdFromToken}");
                 }
             }
             catch (Exception ex)
@@ -258,6 +259,34 @@ namespace EmploymentApp.Services
             }
         }
 
+        private string ExtractUserIdFromToken(string token)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(token))
+                    return string.Empty;
+
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+
+                var user_idClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "user_id");
+
+                if (user_idClaim != null)
+                {
+                    Debug.WriteLine($"Id extracted from token: {user_idClaim.Value}");
+                    return user_idClaim.Value;
+                }
+
+                Debug.WriteLine("Id claim not found in token");
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error extracting Id from token: {ex.Message}");
+                return string.Empty;
+            }
+        }
+
         public void Dispose()
         {
             _httpClient?.Dispose();
@@ -269,7 +298,6 @@ namespace EmploymentApp.Services
         public bool Success { get; set; }
         public string UserId { get; set; }
         public string Role { get; set; }
-        public string Email { get; set; }
     }
 
     public class UserAuthData

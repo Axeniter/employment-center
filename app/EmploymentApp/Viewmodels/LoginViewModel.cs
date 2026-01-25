@@ -12,7 +12,7 @@ namespace EmploymentApp.Viewmodels
 {
     public partial class LoginViewModel : ObservableObject
     {
-
+        private readonly ApiClient _apiClient; 
         private readonly AuthService _authService;
 
         [ObservableProperty]
@@ -21,9 +21,10 @@ namespace EmploymentApp.Viewmodels
         [ObservableProperty]
         private string password;
 
-        public LoginViewModel(AuthService authService)
+        public LoginViewModel(AuthService authService, ApiClient apiClient)
         {
             _authService = authService;
+            _apiClient = apiClient;
         }
 
         [RelayCommand]
@@ -52,14 +53,30 @@ namespace EmploymentApp.Viewmodels
                     Debug.WriteLine($"User ID: {userId}");
                     Debug.WriteLine($"Role: {role}");
 
-                    if (role == "applicant")
+                    if (!await CheckProfileExist())
                     {
-                        await Shell.Current.GoToAsync("//ApplicantPage");
+                        if (role == "applicant")
+                        {
+                            await Shell.Current.GoToAsync("//ApplicantCreateProfilePage");
+                        }
+                        else if (role == "employer")
+                        {
+                            await Shell.Current.GoToAsync("//EmployerCreateProfilePage");
+                        }
                     }
-                    else if (role == "employer")
+                    else
                     {
-                        await Shell.Current.GoToAsync("//EmployerPage");
+                        if (role == "applicant")
+                        {
+                            await Shell.Current.GoToAsync("//ApplicantPage");
+                        }
+                        else if (role == "employer")
+                        {
+                            await Shell.Current.GoToAsync("//EmployerPage");
+                        }
                     }
+                   
+                    
                 }
                 else
                 {
@@ -95,7 +112,7 @@ namespace EmploymentApp.Viewmodels
                 if (string.IsNullOrEmpty(token))
                     return false;
 
-                var response = await _apiClient.GetAsync("/profile/me", token); //Добавить апи сервис и разкоментить остальные файлы!
+                var response = await _apiClient.GetAsync("/profile/me", token); 
 
                 if (response.IsSuccessStatusCode)
                     return true;

@@ -36,6 +36,7 @@ namespace EmploymentApp
             builder.Services.AddTransient<ApplicantCreateProfilePage>();
 
             builder.Services.AddSingleton<AuthService>();
+            builder.Services.AddSingleton<ApiClient>();
 
             return builder.Build();
         }
