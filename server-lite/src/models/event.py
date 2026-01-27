@@ -10,7 +10,7 @@ class Event(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(200), nullable=False)
     description = Column(Text, nullable=False)
-    location = Column(String(200))
+    location = Column(String(200), nullable=True)
     is_remote = Column(Boolean, default=False)
     date = Column(DateTime(timezone=True), nullable=False)
     is_active = Column(Boolean, default=True)
