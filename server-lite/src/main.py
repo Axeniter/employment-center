@@ -10,11 +10,6 @@ from config import config
 from core.database import Base, engine
 from api.api import api_router
 from contextlib import asynccontextmanager
-from models.user import User
-from models.chat import Message
-from models.event import Event
-from models.profile import ApplicantProfile, EmployerProfile
-from models.vacancy import Vacancy, Response
 
 os.makedirs(config.UPLOAD_DIR, exist_ok=True)
 
