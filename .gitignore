@@ -643,3 +643,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Uploads
+uploads/
