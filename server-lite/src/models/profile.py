@@ -23,7 +23,7 @@ class ApplicantProfile(BaseProfile):
     phone_number = Column(String(20), nullable=True)
     birth_date = Column(Date, nullable=True)
     city = Column(String(50), nullable=True)
-    about = Column(Text)
+    about = Column(Text, nullable=True)
     skills = Column(ARRAY(String))
 
     user = relationship("User", back_populates="applicant_profile", uselist=False)
@@ -38,8 +38,8 @@ class EmployerProfile(BaseProfile):
     __tablename__ = "employer_profiles"
 
     company_name = Column(String(100), nullable=False)
-    description = Column(Text)
-    contact = Column(Text)
+    description = Column(Text, nullable=True)
+    contact = Column(Text, nullable=True)
 
     user = relationship("User", back_populates="employer_profile", uselist=False)
     

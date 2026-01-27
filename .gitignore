@@ -644,5 +644,5 @@ FodyWeavers.xsd
 *.msm
 *.msp
 
-
+# Uploads
 uploads/

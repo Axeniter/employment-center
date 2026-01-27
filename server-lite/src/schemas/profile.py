@@ -39,11 +39,11 @@ class ApplicantProfileResponse(BaseModel):
     user_id: UUID
     first_name: str
     last_name: str
-    middle_name: str
-    phone_number: str
-    birth_date: date
-    city: str
-    about: str
+    middle_name: Optional[str]
+    phone_number: Optional[str]
+    birth_date: Optional[date]
+    city: Optional[str]
+    about: Optional[str]
     skills: List[str]
 
     class Config:
@@ -53,8 +53,8 @@ class EmployerProfileResponse(BaseModel):
     profile_type: Literal[UserRole.EMPLOYER] = UserRole.EMPLOYER
     user_id: UUID
     company_name: str
-    description: str
-    contact: str
+    description: Optional[str]
+    contact: Optional[str]
 
     class Config:
         from_attributes = True
