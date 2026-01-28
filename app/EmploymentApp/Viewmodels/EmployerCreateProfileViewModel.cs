@@ -7,7 +7,7 @@ namespace EmploymentApp.Viewmodels
 {
     public partial class EmployerCreateProfileViewModel : ObservableObject
     {
-        //private readonly ApiClient _apiClient;
+        private readonly ApiClient _apiClient;
         private readonly AuthService _authService;
 
         [ObservableProperty]
@@ -19,9 +19,9 @@ namespace EmploymentApp.Viewmodels
         [ObservableProperty]
         private string contact = "";
 
-        public EmployerCreateProfileViewModel(/*ApiClient apiClient, */AuthService authService)
+        public EmployerCreateProfileViewModel(ApiClient apiClient, AuthService authService)
         {
-            //_apiClient = apiClient;
+            _apiClient = apiClient;
             _authService = authService;
         }
 
@@ -30,51 +30,51 @@ namespace EmploymentApp.Viewmodels
         {
             await Application.Current.MainPage.DisplayAlert("Успех!", "Профиль сохранен", "OK");
 
-            //    if (string.IsNullOrWhiteSpace(CompanyName))
-            //    {
-            //        await Application.Current.MainPage.DisplayAlert("Ошибка", "Введите название компании", "OK");
-            //        return;
-            //    }
+            if (string.IsNullOrWhiteSpace(CompanyName))
+            {
+                await Application.Current.MainPage.DisplayAlert("Ошибка", "Введите название компании", "OK");
+                return;
+            }
 
-            //    if (string.IsNullOrWhiteSpace(Description))
-            //    {
-            //        await Application.Current.MainPage.DisplayAlert("Ошибка", "Введите описание компании", "OK");
-            //        return;
-            //    }
+            if (string.IsNullOrWhiteSpace(Description))
+            {
+                await Application.Current.MainPage.DisplayAlert("Ошибка", "Введите описание компании", "OK");
+                return;
+            }
 
-            //    if (string.IsNullOrWhiteSpace(Contact))
-            //    {
-            //        await Application.Current.MainPage.DisplayAlert("Ошибка", "Введите контактную информацию", "OK");
-            //        return;
-            //    }
+            if (string.IsNullOrWhiteSpace(Contact))
+            {
+                await Application.Current.MainPage.DisplayAlert("Ошибка", "Введите контактную информацию", "OK");
+                return;
+            }
 
-            //    try
-            //    {
-            //        var profileData = new
-            //        {
-            //            company_name = CompanyName,
-            //            description = Description,
-            //            contact = Contact
-            //        };
+            try
+            {
+                var profileData = new
+                {
+                    company_name = CompanyName,
+                    description = Description,
+                    contact = Contact
+                };
 
-            //        var token = await _authService.GetAccessTokenAsync();
-            //        var response = await _apiClient.PostAsync("/employer/profile", profileData, token);
+                var token = await _authService.GetAccessTokenAsync();
+                var response = await _apiClient.PostAsync("/profile/employer", profileData, token);
 
-            //        if (response.IsSuccessStatusCode)
-            //        {
-            //            await Application.Current.MainPage.DisplayAlert("Успех", "Профиль сохранён", "OK");
-            //            await Shell.Current.GoToAsync("//EmployerPage");
-            //        }
-            //        else
-            //        {
-            //            await Application.Current.MainPage.DisplayAlert("Ошибка", "Не удалось сохранить профиль", "OK");
-            //        }
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        Debug.WriteLine($"Profile save error: {ex.Message}");
-            //        await Application.Current.MainPage.DisplayAlert("Ошибка", $"Ошибка: {ex.Message}", "OK");
-            //    }
+                if (response.IsSuccessStatusCode)
+                {
+                    await Application.Current.MainPage.DisplayAlert("Успех", "Профиль сохранён", "OK");
+                    await Shell.Current.GoToAsync("//EmployerPage");
+                }
+                else
+                {
+                    await Application.Current.MainPage.DisplayAlert("Ошибка", "Не удалось сохранить профиль", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Profile save error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert("Ошибка", $"Ошибка: {ex.Message}", "OK");
+            }
         }
     }
 }

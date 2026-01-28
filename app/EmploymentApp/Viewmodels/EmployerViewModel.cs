@@ -15,8 +15,6 @@ namespace EmploymentApp.Viewmodels
         [ObservableProperty]
         private bool isVacancySelected;
 
-
-
         [ObservableProperty]
         private ObservableCollection<Event> eventCollection;
 
