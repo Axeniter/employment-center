@@ -97,6 +97,13 @@ namespace EmploymentApp.Viewmodels
         private readonly AuthService _authService;
 
         [ObservableProperty]
+        private bool hasNoEvents;
+
+        [ObservableProperty]
+        private bool hasNoVacancies;
+
+
+        [ObservableProperty]
         private string companyName;
 
         [ObservableProperty]
@@ -135,9 +142,7 @@ namespace EmploymentApp.Viewmodels
 
             UpdateColors();
             
-            LoadProfile();
-            LoadVacancies();
-            LoadEvents();
+            LoadData();
 
             // Инициализация коллекции событий
             EventCollection = new ObservableCollection<Event>();
@@ -148,6 +153,17 @@ namespace EmploymentApp.Viewmodels
             // Инициализация отображаемых коллекций
             DisplayedEvents = new ObservableCollection<Event>(EventCollection);
             DisplayedVacancies = new ObservableCollection<Vacancy>();
+        }
+
+        [RelayCommand]
+        public async Task LoadData()
+        {
+    
+            await LoadProfile();
+            await LoadVacancies();
+            await LoadEvents();
+            IsVacancySelected = false;
+            UpdateEmptyStates();
         }
 
         private async Task LoadProfile()
@@ -343,6 +359,22 @@ namespace EmploymentApp.Viewmodels
                 DisplayedVacancies.Clear();
                 DisplayedEvents = new ObservableCollection<Event>(EventCollection);
             }
+        }
+
+        private void UpdateEmptyStates()
+        {
+            HasNoEvents = DisplayedEvents?.Count == 0;
+            HasNoVacancies = DisplayedVacancies?.Count == 0;
+        }
+
+        partial void OnDisplayedEventsChanged(ObservableCollection<Event> value)
+        {
+            UpdateEmptyStates();
+        }
+
+        partial void OnDisplayedVacanciesChanged(ObservableCollection<Vacancy> value)
+        {
+            UpdateEmptyStates();
         }
 
         [RelayCommand]

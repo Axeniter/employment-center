@@ -115,32 +115,24 @@
                            TextColor="#212121"/>
 
                 </VerticalStackLayout>
-                
-                <VerticalStackLayout Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Spacing="10">
-                    <!-- Переключатель события/вакансии -->
-                    <Grid ColumnDefinitions="*,*" 
-                          ColumnSpacing="10">
 
+                <VerticalStackLayout Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Spacing="10">
+
+                    <!-- Переключатель события/вакансии -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                         <Border BackgroundColor="{Binding EventColor}"
                                 Stroke="Transparent" 
                                 StrokeThickness="0"
                                 HeightRequest="50" 
                                 HorizontalOptions="Fill" 
                                 Padding="0">
-
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="10"/>
                             </Border.StrokeShape>
-
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding EventTappedCommand}"/>
                             </Border.GestureRecognizers>
-
-                            <Label Text="События" 
-                                   FontSize="16" 
-                                   HorizontalOptions="Center" 
-                                   VerticalOptions="Center" 
-                                   TextColor="Black"/>
+                            <Label Text="События" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
                         </Border>
 
                         <Border Grid.Column="1" 
@@ -150,27 +142,21 @@
                                 HeightRequest="50" 
                                 HorizontalOptions="Fill" 
                                 Padding="0">
-
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="10"/>
                             </Border.StrokeShape>
-
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding VacancyTappedCommand}"/>
                             </Border.GestureRecognizers>
-
-                            <Label Text="Вакансии" FontSize="16" 
-                                   HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
+                            <Label Text="Вакансии" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
                         </Border>
                     </Grid>
 
-                    <!-- CollectionView для событий -->
                     <CollectionView ItemsSource="{Binding DisplayedEvents}"
                                     IsVisible="{Binding IsVacancySelected, Converter={StaticResource InvertedBoolConverter}}"
                                     SelectionMode="Single"
                                     SelectionChangedCommand="{Binding EventSelectedCommand}"
                                     Margin="10,0">
-
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
                                 <VerticalStackLayout Padding="0,5">
@@ -187,13 +173,22 @@
                         </CollectionView.ItemTemplate>
                     </CollectionView>
 
-                    <!-- CollectionView для вакансий -->
+                    <VerticalStackLayout IsVisible="{Binding IsVacancySelected, Converter={StaticResource InvertedBoolConverter}}" 
+                                         Padding="20" 
+                                         Spacing="10"
+                                         VerticalOptions="Center"
+                                         HorizontalOptions="Center">
+                        <VerticalStackLayout IsVisible="{Binding HasNoEvents}" Spacing="10">
+                            <Label Text="Нет событий" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#999"/>
+                            <Label Text="Вы пока не создали ни одного события" FontSize="12" HorizontalOptions="Center" TextColor="#ccc"/>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
                     <CollectionView ItemsSource="{Binding DisplayedVacancies}"
                                     IsVisible="{Binding IsVacancySelected}"
                                     SelectionMode="Single"
                                     SelectionChangedCommand="{Binding VacancySelectedCommand}"
                                     Margin="10,0">
-
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
                                 <VerticalStackLayout Padding="0,5">
@@ -202,7 +197,7 @@
                                             <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold"/>
                                             <Label Text="{Binding SalaryRange}" FontSize="14" TextColor="Green" FontAttributes="Bold"/>
                                             <Label Text="{Binding WorkLocation}" FontSize="14" TextColor="Gray"/>
-                                            
+
                                             <HorizontalStackLayout Spacing="5">
                                                 <CollectionView ItemsSource="{Binding Tags}" SelectionMode="None">
                                                     
@@ -217,7 +212,6 @@
                                                             </Border>
                                                         </DataTemplate>
                                                     </CollectionView.ItemTemplate>
-                                                    
                                                 </CollectionView>
                                             </HorizontalStackLayout>
                                         </VerticalStackLayout>
@@ -227,8 +221,21 @@
                         </CollectionView.ItemTemplate>
                     </CollectionView>
 
+                    <VerticalStackLayout IsVisible="{Binding IsVacancySelected}" 
+                                         Padding="20" 
+                                         Spacing="10"
+                                         VerticalOptions="Center"
+                                         HorizontalOptions="Center">
+                        
+                        <VerticalStackLayout IsVisible="{Binding HasNoVacancies}" Spacing="10">
+                            <Label Text="Нет вакансий" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#999"/>
+                            <Label Text="Вы пока не создали ни одной вакансии" FontSize="12" HorizontalOptions="Center" TextColor="#ccc"/>
+                        </VerticalStackLayout>
+                        
+                    </VerticalStackLayout>
+
                 </VerticalStackLayout>
-                
+
             </Grid>
 
         </VerticalStackLayout>
