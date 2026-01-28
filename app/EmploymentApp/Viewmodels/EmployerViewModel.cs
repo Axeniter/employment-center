@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using EmploymentApp.Models;
 using EmploymentApp.Services;
 using System;
+using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -23,6 +24,71 @@ namespace EmploymentApp.Viewmodels
 
         [JsonPropertyName("contact")]
         public string Contact { get; set; }
+    }
+
+    public class VacancyResponse
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("title")]
+        public string Title { get; set; }
+
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [JsonPropertyName("tags")]
+        public List<string> Tags { get; set; } = new();
+
+        [JsonPropertyName("salary_from")]
+        public int SalaryFrom { get; set; }
+
+        [JsonPropertyName("salary_to")]
+        public int SalaryTo { get; set; }
+
+        [JsonPropertyName("salary_currency")]
+        public string SalaryCurrency { get; set; }
+
+        [JsonPropertyName("location")]
+        public string Location { get; set; }
+
+        [JsonPropertyName("is_remote")]
+        public bool IsRemote { get; set; }
+
+        [JsonPropertyName("employer_id")]
+        public string EmployerId { get; set; }
+
+        [JsonPropertyName("is_active")]
+        public bool IsActive { get; set; }
+
+    }
+
+    public class EventResponse
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("title")]
+        public string Title { get; set; }
+
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [JsonPropertyName("location")]
+        public string Location { get; set; }
+
+        [JsonPropertyName("is_remote")]
+        public bool IsRemote { get; set; }
+
+        [JsonPropertyName("date")]
+        public DateTime Date { get; set; }
+
+        [JsonPropertyName("employer_id")]
+        public string EmployerId { get; set; }
+
+        [JsonPropertyName("is_active")]
+        public bool IsActive { get; set; }
+
     }
 
     public partial class EmployerViewModel : ObservableObject
@@ -69,47 +135,19 @@ namespace EmploymentApp.Viewmodels
 
             UpdateColors();
             
-            LoadProfileAsync();
+            LoadProfile();
+            LoadVacancies();
+            LoadEvents();
 
             // Инициализация коллекции событий
-            EventCollection = new ObservableCollection<Event>
-            {
-            new Event(1, "IT Конференция 2026", "Крупная конференция для разработчиков",
-                "Владивосток", false, new DateTime(2026, 2, 15, 10, 0, 0), 1, true),
-
-            new Event(2, "WebDeveloper Meetup", "Встреча веб-разработчиков",
-                "Онлайн", true, new DateTime(2026, 2, 20, 18, 0, 0), 1, true),
-
-            new Event(3, "C# Workshop", "Практический воркшоп по C#",
-                "Санкт-Петербург", false, new DateTime(2026, 3, 10, 14, 0, 0), 1, true)
-            };
+            EventCollection = new ObservableCollection<Event>();
 
             // Инициализация коллекции вакансий
-            VacancyCollection = new ObservableCollection<Vacancy>
-            {
-            new Vacancy(1, "Senior C# Developer", "Требуется опыт работы с ASP.NET Core и SignalR",
-                150000, 250000, "Владивосток", true,
-                1, new List<string> { "C#", "ASP.NET Core", "SQL" }, "RUB", true),
-
-            new Vacancy(2, "Junior React Developer", "Начинающий разработчик для веб-приложений",
-                80000, 120000, "Москва", false,
-                1, new List<string> { "React", "JavaScript", "CSS" }, "RUB", true),
-
-            new Vacancy(3, "Python Backend Developer", "Разработчик на Django и DRF",
-                120000, 180000, "Санкт-Петербург", true,
-                1, new List<string> { "Python", "Django", "PostgreSQL" }, "RUB", true)
-
-
-            };
+            VacancyCollection = new ObservableCollection<Vacancy>();
 
             // Инициализация отображаемых коллекций
             DisplayedEvents = new ObservableCollection<Event>(EventCollection);
             DisplayedVacancies = new ObservableCollection<Vacancy>();
-        }
-
-        private async void LoadProfileAsync()
-        {
-            await LoadProfile();
         }
 
         private async Task LoadProfile()
@@ -157,6 +195,125 @@ namespace EmploymentApp.Viewmodels
                 await Application.Current.MainPage.DisplayAlert(
                     "Ошибка",
                     $"Ошибка загрузки профиля: {ex.Message}",
+                    "OK"
+                );
+            }
+        }
+
+        private async Task LoadVacancies()
+        {
+            try
+            {
+                var token = await _authService.GetAccessTokenAsync();
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    await Application.Current.MainPage.DisplayAlert(
+                        "Ошибка",
+                        "Токен не найден",
+                        "OK"
+                    );
+                    return;
+                }
+
+                var vacanciesResponse = await _apiClient.GetAsJsonAsync<List<VacancyResponse>>("/vacancies/me", token);
+
+                if (vacanciesResponse != null && vacanciesResponse.Count > 0)
+                {
+                    DisplayedVacancies.Clear();
+
+                    foreach (var vacancy in vacanciesResponse)
+                    {
+                        VacancyCollection.Add(new Vacancy(
+                            vacancy.Id,
+                            vacancy.Title,
+                            vacancy.Description,
+                            vacancy.SalaryFrom,
+                            vacancy.SalaryTo,
+                            vacancy.Location,
+                            vacancy.IsRemote,
+                            vacancy.EmployerId,
+                            vacancy.Tags,
+                            vacancy.SalaryCurrency,
+                            vacancy.IsActive
+                        ));
+                    }
+
+                    Debug.WriteLine($"Vacancies loaded successfully: {DisplayedVacancies.Count}");
+                }
+                else
+                {
+                    await Application.Current.MainPage.DisplayAlert(
+                        "Ошибка",
+                        "Не удалось загрузить вакансии",
+                        "OK"
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Load vacancies error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert(
+                    "Ошибка",
+                    $"Ошибка загрузки вакансий: {ex.Message}",
+                    "OK"
+                );
+            }
+        }
+
+        private async Task LoadEvents()
+        {
+            try
+            {
+                var token = await _authService.GetAccessTokenAsync();
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    await Application.Current.MainPage.DisplayAlert(
+                        "Ошибка",
+                        "Токен не найден",
+                        "OK"
+                    );
+                    return;
+                }
+
+                var eventsResponse = await _apiClient.GetAsJsonAsync<List<EventResponse>>("/events/me", token);
+
+                if (eventsResponse != null && eventsResponse.Count > 0)
+                {
+                    DisplayedEvents.Clear();
+
+                    foreach (var eventItem in eventsResponse)
+                    {
+                        EventCollection.Add(new Event(
+                            eventItem.Id,
+                            eventItem.Title,
+                            eventItem.Description,
+                            eventItem.Location,
+                            eventItem.IsRemote,
+                            eventItem.Date,
+                            eventItem.EmployerId,
+                            true
+                        ));
+                    }
+
+                    Debug.WriteLine($"Events loaded successfully: {DisplayedEvents.Count}");
+                }
+                else
+                {
+                    await Application.Current.MainPage.DisplayAlert(
+                        "Ошибка",
+                        "Не удалось загрузить события",
+                        "OK"
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Load events error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert(
+                    "Ошибка",
+                    $"Ошибка загрузки событий: {ex.Message}",
                     "OK"
                 );
             }

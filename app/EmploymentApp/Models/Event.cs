@@ -22,7 +22,7 @@ namespace EmploymentApp.Models
 
         public bool IsActive { get; set; }
 
-        public int EmployerId { get; set; }
+        public string EmployerId { get; set; }
 
         public string FormattedDate =>
             Date.ToString("dd MMMM yyyy, HH:mm", new System.Globalization.CultureInfo("ru-RU"));
@@ -31,7 +31,7 @@ namespace EmploymentApp.Models
             IsRemote ? "Онлайн" : Location;
 
         public Event(int id, string title, string description, string location, bool isRemote,
-            DateTime date, int employerId, bool isActive = true )
+            DateTime date, string employerId, bool isActive = true )
         {
             Id = id;
             Title = title;

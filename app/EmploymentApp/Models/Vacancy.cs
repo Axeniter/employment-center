@@ -28,7 +28,7 @@ namespace EmploymentApp.Models
 
         public bool IsActive { get; set; } = true;
 
-        public int EmployerId { get; set; }
+        public string EmployerId { get; set; }
 
         public string SalaryRange =>
             $"{SalaryFrom:N0} — {SalaryTo:N0} {SalaryCurrency}";
@@ -40,7 +40,7 @@ namespace EmploymentApp.Models
             int salaryFrom, int salaryTo, 
             string location, 
             bool isRemote,
-            int employerId, 
+            string employerId, 
             List<string> tags = null, 
             string salaryCurrency = "RUB", 
             bool isActive = true)
