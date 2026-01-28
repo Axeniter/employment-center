@@ -28,8 +28,6 @@ namespace EmploymentApp.Viewmodels
         [RelayCommand]
         private async Task SaveProfile()
         {
-            await Application.Current.MainPage.DisplayAlert("Успех!", "Профиль сохранен", "OK");
-
             if (string.IsNullOrWhiteSpace(CompanyName))
             {
                 await Application.Current.MainPage.DisplayAlert("Ошибка", "Введите название компании", "OK");

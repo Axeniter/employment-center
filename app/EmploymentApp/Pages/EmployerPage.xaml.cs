@@ -4,9 +4,15 @@ namespace EmploymentApp.Pages;
 
 public partial class EmployerPage : ContentPage
 {
-	public EmployerPage(EmployerViewModel vm)
+    private readonly EmployerViewModel _viewModel;
+
+	public EmployerPage(EmployerViewModel viewModel)
 	{
 		InitializeComponent();
-		BindingContext = vm;
+        _viewModel = viewModel;
+		BindingContext = _viewModel;
 	}
 }
+
+
+

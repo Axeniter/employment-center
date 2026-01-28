@@ -1,17 +1,93 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Text.Json.Serialization;
 using EmploymentApp.Models;
+using EmploymentApp.Services;
 
 namespace EmploymentApp.Viewmodels
 {
+    public class EventResponse
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("title")]
+        public string Title { get; set; }
+
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [JsonPropertyName("location")]
+        public string Location { get; set; }
+
+        [JsonPropertyName("is_remote")]
+        public bool IsRemote { get; set; }
+
+        [JsonPropertyName("date")]
+        public DateTime Date { get; set; }
+
+        [JsonPropertyName("is_active")]
+        public bool IsActive { get; set; }
+
+        [JsonPropertyName("employer_id")]
+        public string EmployerId { get; set; }
+    }
+
+    public class VacancyResponse
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("title")]
+        public string Title { get; set; }
+
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [JsonPropertyName("salary_from")]
+        public int SalaryFrom { get; set; }
+
+        [JsonPropertyName("salary_to")]
+        public int SalaryTo { get; set; }
+
+        [JsonPropertyName("salary_currency")]
+        public string SalaryCurrency { get; set; }
+
+        [JsonPropertyName("location")]
+        public string Location { get; set; }
+
+        [JsonPropertyName("is_remote")]
+        public bool IsRemote { get; set; }
+
+        [JsonPropertyName("is_active")]
+        public bool IsActive { get; set; }
+
+        [JsonPropertyName("employer_id")]
+        public string EmployerId { get; set; }
+
+        [JsonPropertyName("tags")]
+        public List<string> Tags { get; set; }
+    }
+
+    public class EmployerProfileResponse
+    {
+        [JsonPropertyName("company_name")]
+        public string CompanyName { get; set; }
+
+        [JsonPropertyName("contact")]
+        public string Contact { get; set; }
+
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+    }
+
     public partial class EmployerViewModel : ObservableObject
     {
+        private readonly ApiClient _apiClient;
+        private readonly AuthService _authService;
+
         [ObservableProperty]
         private bool isVacancySelected;
 
@@ -27,64 +103,240 @@ namespace EmploymentApp.Viewmodels
         [ObservableProperty]
         private ObservableCollection<Vacancy> displayedVacancies;
 
-
-
         [ObservableProperty]
         private Color eventColor = Color.FromArgb("#9dfca8");
 
         [ObservableProperty]
         private Color vacancyColor = Color.FromArgb("#e0e0e0");
 
-        public EmployerViewModel()
+        [ObservableProperty]
+        private bool isLoading = false;
+
+        [ObservableProperty]
+        private string companyName = "Загрузка...";
+
+        [ObservableProperty]
+        private string companyPhone = "";
+
+        [ObservableProperty]
+        private string companyDescription = "";
+
+        public EmployerViewModel(ApiClient apiClient, AuthService authService)
         {
-            UpdateColors();  // Инициализация цветов
+            _apiClient = apiClient;
+            _authService = authService;
 
-            // Инициализация коллекции событий
-            EventCollection = new ObservableCollection<Event>
-            {
-            new Event(1, "IT Конференция 2026", "Крупная конференция для разработчиков",
-                "Владивосток", false, new DateTime(2026, 2, 15, 10, 0, 0), 1, true),
-
-            new Event(2, "WebDeveloper Meetup", "Встреча веб-разработчиков",
-                "Онлайн", true, new DateTime(2026, 2, 20, 18, 0, 0), 1, true),
-
-            new Event(3, "C# Workshop", "Практический воркшоп по C#",
-                "Санкт-Петербург", false, new DateTime(2026, 3, 10, 14, 0, 0), 1, true)
-            };
-
-            // Инициализация коллекции вакансий
-            VacancyCollection = new ObservableCollection<Vacancy>
-            {
-            new Vacancy(1, "Senior C# Developer", "Требуется опыт работы с ASP.NET Core и SignalR",
-                150000, 250000, "Владивосток", true,
-                1, new List<string> { "C#", "ASP.NET Core", "SQL" }, "RUB", true),
-
-            new Vacancy(2, "Junior React Developer", "Начинающий разработчик для веб-приложений",
-                80000, 120000, "Москва", false,
-                1, new List<string> { "React", "JavaScript", "CSS" }, "RUB", true),
-
-            new Vacancy(3, "Python Backend Developer", "Разработчик на Django и DRF",
-                120000, 180000, "Санкт-Петербург", true,
-                1, new List<string> { "Python", "Django", "PostgreSQL" }, "RUB", true)
-
-
-            };
-
-            // Инициализация отображаемых коллекций
-            DisplayedEvents = new ObservableCollection<Event>(EventCollection);
+            EventCollection = new ObservableCollection<Event>();
+            VacancyCollection = new ObservableCollection<Vacancy>();
+            DisplayedEvents = new ObservableCollection<Event>();
             DisplayedVacancies = new ObservableCollection<Vacancy>();
+
+            IsVacancySelected = false;
+
+            InitializeAsync();
+        }
+
+        private async void InitializeAsync()
+        {
+            await LoadAllData();
+        }
+
+        [RelayCommand]
+        private async Task RefreshData()
+        {
+            await LoadAllData();
+        }
+
+        private async Task LoadAllData()
+        {
+            IsLoading = true;
+
+            try
+            {
+                var token = await _authService.GetAccessTokenAsync();
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    Debug.WriteLine("❌ No token found");
+                    return;
+                }
+
+                var profileTask = LoadEmployerProfile(token);
+                var eventsTask = LoadEvents(token);
+                var vacanciesTask = LoadVacancies(token);
+
+                await Task.WhenAll(profileTask, eventsTask, vacanciesTask);
+
+                UpdateColors();
+                UpdateDisplayedCollections();
+
+                Debug.WriteLine($"✅ All loaded - Events: {EventCollection.Count}, Vacancies: {VacancyCollection.Count}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"❌ Error: {ex.Message}\n{ex.StackTrace}");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        private async Task LoadEmployerProfile(string token)
+        {
+            try
+            {
+                var profile = await _apiClient.GetAsJsonAsync<EmployerProfileResponse>(
+                    "/profile/me",
+                    token
+                );
+
+                if (profile != null)
+                {
+                    CompanyName = profile.CompanyName ?? "Компания";
+                    CompanyPhone = profile.Contact ?? "";
+                    CompanyDescription = profile.Description ?? "";
+                    Debug.WriteLine("✅ Profile loaded");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"❌ Profile error: {ex.Message}");
+            }
+        }
+
+        private async Task LoadEvents(string token)
+        {
+            try
+            {
+                Debug.WriteLine("📅 Loading events...");
+
+                var events = await _apiClient.GetAsJsonAsync<List<EventResponse>>(
+                    "/events/me",
+                    token
+                );
+
+                Debug.WriteLine($"Raw events response count: {events?.Count}");
+
+                EventCollection.Clear();
+
+                if (events != null && events.Count > 0)
+                {
+                    foreach (var eventData in events)
+                    {
+                        Debug.WriteLine($"Creating event - Id: {eventData.Id}, Title: {eventData.Title}");
+
+                        try
+                        {
+                            var eventItem = new Event(
+                                eventData.Id,
+                                eventData.Title,
+                                eventData.Description,
+                                eventData.Location,
+                                eventData.IsRemote,
+                                eventData.Date,
+                                eventData.EmployerId,
+                                eventData.IsActive
+                            );
+
+                            EventCollection.Add(eventItem);
+                            Debug.WriteLine($"✅ Added event: {eventItem.Title}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"❌ Error creating event: {ex.Message}");
+                        }
+                    }
+                    Debug.WriteLine($"✅ Events loaded: {EventCollection.Count}");
+                }
+                else
+                {
+                    Debug.WriteLine("⚠️ No events (null or empty)");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"❌ Events error: {ex.Message}\n{ex.StackTrace}");
+            }
+        }
+
+        private async Task LoadVacancies(string token)
+        {
+            try
+            {
+                Debug.WriteLine("💼 Loading vacancies...");
+
+                var vacancies = await _apiClient.GetAsJsonAsync<List<VacancyResponse>>(
+                    "/vacancies/me",
+                    token
+                );
+
+                Debug.WriteLine($"Raw vacancies response count: {vacancies?.Count}");
+
+                VacancyCollection.Clear();
+
+                if (vacancies != null && vacancies.Count > 0)
+                {
+                    foreach (var vacancyData in vacancies)
+                    {
+                        Debug.WriteLine($"Creating vacancy - Id: {vacancyData.Id}, Title: {vacancyData.Title}");
+
+                        try
+                        {
+                            var vacancy = new Vacancy(
+                                vacancyData.Id,
+                                vacancyData.Title,
+                                vacancyData.Description,
+                                vacancyData.SalaryFrom,
+                                vacancyData.SalaryTo,
+                                vacancyData.Location,
+                                vacancyData.IsRemote,
+                                vacancyData.EmployerId,
+                                vacancyData.Tags ?? new List<string>(),
+                                vacancyData.SalaryCurrency,
+                                vacancyData.IsActive
+                            );
+
+                            VacancyCollection.Add(vacancy);
+                            Debug.WriteLine($"✅ Added vacancy: {vacancy.Title}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"❌ Error creating vacancy: {ex.Message}");
+                        }
+                    }
+                    Debug.WriteLine($"✅ Vacancies loaded: {VacancyCollection.Count}");
+                }
+                else
+                {
+                    Debug.WriteLine("⚠️ No vacancies (null or empty)");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"❌ Vacancies error: {ex.Message}\n{ex.StackTrace}");
+            }
         }
 
         partial void OnIsVacancySelectedChanged(bool value)
         {
             UpdateColors();
             UpdateDisplayedCollections();
+            Debug.WriteLine($"View switched - Vacancies: {IsVacancySelected}");
         }
 
         private void UpdateColors()
         {
-            EventColor = IsVacancySelected ? Color.FromArgb("#e0e0e0") : Color.FromArgb("#9dfca8");
-            VacancyColor = IsVacancySelected ? Color.FromArgb("#9dfca8") : Color.FromArgb("#e0e0e0");
+            if (IsVacancySelected)
+            {
+                EventColor = Color.FromArgb("#e0e0e0");
+                VacancyColor = Color.FromArgb("#9dfca8");
+            }
+            else
+            {
+                EventColor = Color.FromArgb("#9dfca8");
+                VacancyColor = Color.FromArgb("#e0e0e0");
+            }
         }
 
         private void UpdateDisplayedCollections()
@@ -92,12 +344,22 @@ namespace EmploymentApp.Viewmodels
             if (IsVacancySelected)
             {
                 DisplayedEvents.Clear();
-                DisplayedVacancies = new ObservableCollection<Vacancy>(VacancyCollection);
+                DisplayedVacancies.Clear();
+                foreach (var vacancy in VacancyCollection)
+                {
+                    DisplayedVacancies.Add(vacancy);
+                }
+                Debug.WriteLine($"Showing vacancies: {DisplayedVacancies.Count}");
             }
             else
             {
                 DisplayedVacancies.Clear();
-                DisplayedEvents = new ObservableCollection<Event>(EventCollection);
+                DisplayedEvents.Clear();
+                foreach (var evt in EventCollection)
+                {
+                    DisplayedEvents.Add(evt);
+                }
+                Debug.WriteLine($"Showing events: {DisplayedEvents.Count}");
             }
         }
 
@@ -111,6 +373,24 @@ namespace EmploymentApp.Viewmodels
         private void VacancyTapped()
         {
             IsVacancySelected = true;
+        }
+
+        [RelayCommand]
+        private void EventSelected(Event selectedEvent)
+        {
+            if (selectedEvent != null)
+            {
+                Debug.WriteLine($"Event selected: {selectedEvent.Title}");
+            }
+        }
+
+        [RelayCommand]
+        private void VacancySelected(Vacancy selectedVacancy)
+        {
+            if (selectedVacancy != null)
+            {
+                Debug.WriteLine($"Vacancy selected: {selectedVacancy.Title}");
+            }
         }
     }
 }

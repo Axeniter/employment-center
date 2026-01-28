@@ -3,8 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="EmploymentApp.Pages.EmployerPage"
              xmlns:models="clr-namespace:EmploymentApp.Models"
-             Title="EmployerPage">
-    
+             Title="Профиль работодателя">
+
     <ScrollView>
         <VerticalStackLayout>
             <Grid HeightRequest="40"
@@ -26,7 +26,7 @@
                         VerticalOptions="Center"
                         HorizontalOptions="Center"/>
 
-                <Label Text="Coбытия"
+                <Label Text="События"
                        Grid.Column="1"
                        BackgroundColor="Transparent"
                        TextColor="Black"
@@ -52,11 +52,17 @@
 
             </Grid>
 
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                               IsVisible="{Binding IsLoading}"
+                               Color="#9dfca8"
+                               Margin="0,20,0,0"/>
+
             <Grid RowDefinitions="*, Auto, Auto, Auto" 
                   ColumnDefinitions="Auto, *"
                   Padding="60,40,40,20" 
                   RowSpacing="30"
-                  ColumnSpacing="40">
+                  ColumnSpacing="40"
+                  IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}">
 
                 <!-- Аватарка -->
                 <Border Grid.Column="0"
@@ -69,7 +75,6 @@
                         HorizontalOptions="Start"
                         VerticalOptions="Start"
                         Margin="0,20,0,0">
-                    <!-- Отступ сверху -->
 
                     <Image Source="dotnet_bot.png"
                            Aspect="AspectFill"
@@ -89,7 +94,7 @@
                            FontAttributes="Bold"
                            TextColor="Black"/>
 
-                    <Label Text="Wildberries"
+                    <Label Text="{Binding CompanyName}"
                            FontSize="20"
                            TextColor="#212121"/>
 
@@ -98,7 +103,7 @@
                            FontAttributes="Bold"
                            TextColor="Black"/>
 
-                    <Label Text="Наш номер: +78005553535"
+                    <Label Text="{Binding CompanyPhone}"
                            FontSize="20"
                            TextColor="#212121"/>
 
@@ -110,12 +115,12 @@
                            FontAttributes="Bold"
                            TextColor="Black"/>
 
-                    <Label Text="Приветствуем вас! Мы команда крутых разработчиков. Ждем именно Вас!"
+                    <Label Text="{Binding CompanyDescription}"
                            FontSize="20"
                            TextColor="#212121"/>
 
                 </VerticalStackLayout>
-                
+
                 <VerticalStackLayout Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Spacing="10">
                     <!-- Переключатель события/вакансии -->
                     <Grid ColumnDefinitions="*,*" 
@@ -164,75 +169,105 @@
                         </Border>
                     </Grid>
 
-                    <!-- CollectionView для событий -->
-                    <CollectionView ItemsSource="{Binding DisplayedEvents}"
-                                    IsVisible="{Binding IsVacancySelected, Converter={StaticResource InvertedBoolConverter}}"
-                                    SelectionMode="Single"
-                                    SelectionChangedCommand="{Binding EventSelectedCommand}"
-                                    Margin="10,0">
+                    <!-- События (видны когда IsVacancySelected = false) -->
+                    <VerticalStackLayout IsVisible="{Binding IsVacancySelected, Converter={StaticResource InvertedBoolConverter}}"
+                                        Spacing="10">
 
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <VerticalStackLayout Padding="0,5">
-                                    <Border Padding="10" StrokeThickness="1" StrokeShape="RoundRectangle 10" Stroke="#e0e0e0">
-                                        <VerticalStackLayout Spacing="5">
-                                            <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold"/>
-                                            <Label Text="{Binding FormattedDate}" FontSize="14" TextColor="Gray"/>
-                                            <Label Text="{Binding EventLocation}" FontSize="14" TextColor="Gray"/>
-                                            <Label Text="{Binding Description}" FontSize="14" LineBreakMode="TailTruncation" MaxLines="2"/>
-                                        </VerticalStackLayout>
-                                    </Border>
-                                </VerticalStackLayout>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
+                        <!-- CollectionView для событий (видна только если есть события) -->
+                        <CollectionView ItemsSource="{Binding DisplayedEvents}"
+                                        IsVisible="{Binding DisplayedEvents.Count, Converter={StaticResource NotEqualToConverter}, ConverterParameter=0}"
+                                        SelectionMode="Single"
+                                        SelectionChangedCommand="{Binding EventSelectedCommand}"
+                                        Margin="10,0">
 
-                    <!-- CollectionView для вакансий -->
-                    <CollectionView ItemsSource="{Binding DisplayedVacancies}"
-                                    IsVisible="{Binding IsVacancySelected}"
-                                    SelectionMode="Single"
-                                    SelectionChangedCommand="{Binding VacancySelectedCommand}"
-                                    Margin="10,0">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <VerticalStackLayout Padding="0,5">
+                                        <Border Padding="10" StrokeThickness="1" StrokeShape="RoundRectangle 10" Stroke="#e0e0e0">
+                                            <VerticalStackLayout Spacing="5">
+                                                <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold"/>
+                                                <Label Text="{Binding FormattedDate}" FontSize="14" TextColor="Gray"/>
+                                                <Label Text="{Binding EventLocation}" FontSize="14" TextColor="Gray"/>
+                                                <Label Text="{Binding Description}" FontSize="14" LineBreakMode="TailTruncation" MaxLines="2"/>
+                                            </VerticalStackLayout>
+                                        </Border>
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
 
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <VerticalStackLayout Padding="0,5">
-                                    <Border Padding="10" StrokeThickness="1" StrokeShape="RoundRectangle 10" Stroke="#e0e0e0">
-                                        <VerticalStackLayout Spacing="5">
-                                            <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold"/>
-                                            <Label Text="{Binding SalaryRange}" FontSize="14" TextColor="Green" FontAttributes="Bold"/>
-                                            <Label Text="{Binding WorkLocation}" FontSize="14" TextColor="Gray"/>
-                                            
-                                            <HorizontalStackLayout Spacing="5">
-                                                <CollectionView ItemsSource="{Binding Tags}" SelectionMode="None">
-                                                    
-                                                    <CollectionView.ItemsLayout>
-                                                        <LinearItemsLayout Orientation="Horizontal" ItemSpacing="5"/>
-                                                    </CollectionView.ItemsLayout>
-                                                    
-                                                    <CollectionView.ItemTemplate>
-                                                        <DataTemplate>
-                                                            <Border Padding="5,2" StrokeThickness="0" StrokeShape="RoundRectangle 10" BackgroundColor="#f0f0f0">
-                                                                <Label Text="{Binding .}" FontSize="11"/>
-                                                            </Border>
-                                                        </DataTemplate>
-                                                    </CollectionView.ItemTemplate>
-                                                    
-                                                </CollectionView>
-                                            </HorizontalStackLayout>
-                                        </VerticalStackLayout>
-                                    </Border>
-                                </VerticalStackLayout>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
+                        <!-- Сообщение когда нет событий -->
+                        <VerticalStackLayout Padding="20" Spacing="10"
+                                           IsVisible="{Binding DisplayedEvents.Count, Converter={StaticResource EqualToConverter}, ConverterParameter=0}"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center">
+                            <Label Text="🎪" FontSize="48" HorizontalOptions="Center"/>
+                            <Label Text="Нет событий" FontSize="18" FontAttributes="Bold" TextColor="Black" HorizontalOptions="Center"/>
+                            <Label Text="Вы пока не создали ни одного события" FontSize="14" TextColor="Gray" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- Вакансии (видны когда IsVacancySelected = true) -->
+                    <VerticalStackLayout IsVisible="{Binding IsVacancySelected}"
+                                        Spacing="10">
+
+                        <!-- CollectionView для вакансий (видна только если есть вакансии) -->
+                        <CollectionView ItemsSource="{Binding DisplayedVacancies}"
+                                        IsVisible="{Binding DisplayedVacancies.Count, Converter={StaticResource NotEqualToConverter}, ConverterParameter=0}"
+                                        SelectionMode="Single"
+                                        SelectionChangedCommand="{Binding VacancySelectedCommand}"
+                                        Margin="10,0">
+
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <VerticalStackLayout Padding="0,5">
+                                        <Border Padding="10" StrokeThickness="1" StrokeShape="RoundRectangle 10" Stroke="#e0e0e0">
+                                            <VerticalStackLayout Spacing="5">
+                                                <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold"/>
+                                                <Label Text="{Binding SalaryRange}" FontSize="14" TextColor="Green" FontAttributes="Bold"/>
+                                                <Label Text="{Binding WorkLocation}" FontSize="14" TextColor="Gray"/>
+
+                                                <HorizontalStackLayout Spacing="5">
+                                                    <CollectionView ItemsSource="{Binding Tags}" SelectionMode="None">
+
+                                                        <CollectionView.ItemsLayout>
+                                                            <LinearItemsLayout Orientation="Horizontal" ItemSpacing="5"/>
+                                                        </CollectionView.ItemsLayout>
+
+                                                        <CollectionView.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Border Padding="5,2" StrokeThickness="0" StrokeShape="RoundRectangle 10" BackgroundColor="#f0f0f0">
+                                                                    <Label Text="{Binding .}" FontSize="11"/>
+                                                                </Border>
+                                                            </DataTemplate>
+                                                        </CollectionView.ItemTemplate>
+
+                                                    </CollectionView>
+                                                </HorizontalStackLayout>
+                                            </VerticalStackLayout>
+                                        </Border>
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                        <!-- Сообщение когда нет вакансий -->
+                        <VerticalStackLayout Padding="20" Spacing="10"
+                                           IsVisible="{Binding DisplayedVacancies.Count, Converter={StaticResource EqualToConverter}, ConverterParameter=0}"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center">
+                            <Label Text="💼" FontSize="48" HorizontalOptions="Center"/>
+                            <Label Text="Нет вакансий" FontSize="18" FontAttributes="Bold" TextColor="Black" HorizontalOptions="Center"/>
+                            <Label Text="Вы пока не создали ни одной вакансии" FontSize="14" TextColor="Gray" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
 
                 </VerticalStackLayout>
-                
+
             </Grid>
 
         </VerticalStackLayout>
-        
+
     </ScrollView>
-    
+
 </ContentPage>

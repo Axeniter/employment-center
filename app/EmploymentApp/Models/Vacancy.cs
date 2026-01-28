@@ -8,7 +8,7 @@ namespace EmploymentApp.Models
 {
     public class Vacancy
     {
-        public int Id { get; set; }
+        public int Id { get; set; }  
 
         public string Title { get; set; }
 
@@ -28,7 +28,7 @@ namespace EmploymentApp.Models
 
         public bool IsActive { get; set; } = true;
 
-        public int EmployerId { get; set; }
+        public string EmployerId { get; set; }  
 
         public string SalaryRange =>
             $"{SalaryFrom:N0} — {SalaryTo:N0} {SalaryCurrency}";
@@ -36,13 +36,13 @@ namespace EmploymentApp.Models
         public string WorkLocation =>
             IsRemote ? "Удаленно" : Location;
 
-        public Vacancy(int id, string title, string description, 
-            int salaryFrom, int salaryTo, 
-            string location, 
+        public Vacancy(int id, string title, string description,  
+            int salaryFrom, int salaryTo,
+            string location,
             bool isRemote,
-            int employerId, 
-            List<string> tags = null, 
-            string salaryCurrency = "RUB", 
+            string employerId,  
+            List<string> tags = null,
+            string salaryCurrency = "RUB",
             bool isActive = true)
         {
             Id = id;
