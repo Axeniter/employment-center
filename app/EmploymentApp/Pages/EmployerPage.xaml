@@ -89,7 +89,7 @@
                            FontAttributes="Bold"
                            TextColor="Black"/>
 
-                    <Label Text="Wildberries"
+                    <Label Text="{Binding CompanyName}"
                            FontSize="20"
                            TextColor="#212121"/>
 
@@ -98,7 +98,7 @@
                            FontAttributes="Bold"
                            TextColor="Black"/>
 
-                    <Label Text="Наш номер: +78005553535"
+                    <Label Text="{Binding Contacts}"
                            FontSize="20"
                            TextColor="#212121"/>
 
@@ -110,7 +110,7 @@
                            FontAttributes="Bold"
                            TextColor="Black"/>
 
-                    <Label Text="Приветствуем вас! Мы команда крутых разработчиков. Ждем именно Вас!"
+                    <Label Text="{Binding Description}"
                            FontSize="20"
                            TextColor="#212121"/>
 

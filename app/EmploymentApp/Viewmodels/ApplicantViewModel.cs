@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace EmploymentApp.Viewmodels
 {
-    public class ProfileResponse
+    public class ApplicantProfileResponse
     {
         [JsonPropertyName("first_name")]
         public string FirstName { get; set; }
@@ -97,7 +97,7 @@ namespace EmploymentApp.Viewmodels
                     return;
                 }
 
-                var profileData = await _apiClient.GetAsJsonAsync<ProfileResponse>(
+                var profileData = await _apiClient.GetAsJsonAsync<ApplicantProfileResponse>(
                     "/profile/me",
                     token
                 );

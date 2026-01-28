@@ -1,17 +1,44 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using EmploymentApp.Models;
+using EmploymentApp.Services;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using System.Collections.ObjectModel;
-using EmploymentApp.Models;
 
 namespace EmploymentApp.Viewmodels
 {
+    public class EmployerProfileResponse
+    {
+        [JsonPropertyName("company_name")]
+        public string CompanyName { get; set; }
+
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [JsonPropertyName("contact")]
+        public string Contact { get; set; }
+    }
+
     public partial class EmployerViewModel : ObservableObject
     {
+        private readonly ApiClient _apiClient;
+        private readonly AuthService _authService;
+
+        [ObservableProperty]
+        private string companyName;
+
+        [ObservableProperty]
+        private string description;
+
+        [ObservableProperty]
+        private string contacts;
+
         [ObservableProperty]
         private bool isVacancySelected;
 
@@ -35,9 +62,14 @@ namespace EmploymentApp.Viewmodels
         [ObservableProperty]
         private Color vacancyColor = Color.FromArgb("#e0e0e0");
 
-        public EmployerViewModel()
+        public EmployerViewModel(ApiClient apiClient, AuthService authService)
         {
-            UpdateColors();  // Инициализация цветов
+            _apiClient = apiClient;
+            _authService = authService;
+
+            UpdateColors();
+            
+            LoadProfileAsync();
 
             // Инициализация коллекции событий
             EventCollection = new ObservableCollection<Event>
@@ -73,6 +105,61 @@ namespace EmploymentApp.Viewmodels
             // Инициализация отображаемых коллекций
             DisplayedEvents = new ObservableCollection<Event>(EventCollection);
             DisplayedVacancies = new ObservableCollection<Vacancy>();
+        }
+
+        private async void LoadProfileAsync()
+        {
+            await LoadProfile();
+        }
+
+        private async Task LoadProfile()
+        {
+            try
+            {
+                var token = await _authService.GetAccessTokenAsync();
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    await Application.Current.MainPage.DisplayAlert(
+                        "Ошибка",
+                        "Токен не найден",
+                        "OK"
+                    );
+
+                    return;
+                }
+
+                var profileData = await _apiClient.GetAsJsonAsync<EmployerProfileResponse>(
+                    "/profile/me",
+                    token
+                );
+
+                if (profileData != null)
+                {
+                    CompanyName = profileData.CompanyName ?? "";
+                    Contacts = profileData.Contact ?? "";
+                    Description = profileData.Description ?? "";
+                    
+                    Debug.WriteLine("Profile loaded successfully");
+                }
+                else
+                {
+                    await Application.Current.MainPage.DisplayAlert(
+                        "Ошибка",
+                        "Не удалось загрузить профиль",
+                        "OK"
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Load profile error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert(
+                    "Ошибка",
+                    $"Ошибка загрузки профиля: {ex.Message}",
+                    "OK"
+                );
+            }
         }
 
         partial void OnIsVacancySelectedChanged(bool value)
