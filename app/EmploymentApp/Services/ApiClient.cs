@@ -13,16 +13,27 @@ namespace EmploymentApp.Services
             var handler = new HttpClientHandler();
             _httpClient = new HttpClient(handler)
             {
-                Timeout = TimeSpan.FromSeconds(30),
-                BaseAddress = new Uri(BaseUrl)
+                Timeout = TimeSpan.FromSeconds(30)
             };
+        }
+
+        private string BuildUrl(string endpoint)
+        {
+            if (endpoint.StartsWith("http://") || endpoint.StartsWith("https://"))
+                return endpoint;
+
+            if (endpoint.StartsWith("/"))
+                return $"{BaseUrl}{endpoint}";
+
+            return $"{BaseUrl}/{endpoint}";
         }
 
         public async Task<HttpResponseMessage> GetAsync(string endpoint, string token = null)
         {
             try
             {
-                var request = new HttpRequestMessage(HttpMethod.Get, endpoint);
+                var url = BuildUrl(endpoint);
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
 
                 if (!string.IsNullOrEmpty(token))
                 {
@@ -43,7 +54,8 @@ namespace EmploymentApp.Services
         {
             try
             {
-                var request = new HttpRequestMessage(HttpMethod.Post, endpoint)
+                var url = BuildUrl(endpoint);
+                var request = new HttpRequestMessage(HttpMethod.Post, url)
                 {
                     Content = JsonContent.Create(data)
                 };
@@ -67,7 +79,8 @@ namespace EmploymentApp.Services
         {
             try
             {
-                var request = new HttpRequestMessage(HttpMethod.Put, endpoint)
+                var url = BuildUrl(endpoint);
+                var request = new HttpRequestMessage(HttpMethod.Put, url)
                 {
                     Content = JsonContent.Create(data)
                 };
@@ -91,7 +104,8 @@ namespace EmploymentApp.Services
         {
             try
             {
-                var request = new HttpRequestMessage(HttpMethod.Delete, endpoint);
+                var url = BuildUrl(endpoint);
+                var request = new HttpRequestMessage(HttpMethod.Delete, url);
 
                 if (!string.IsNullOrEmpty(token))
                 {
