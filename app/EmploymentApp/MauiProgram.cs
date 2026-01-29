@@ -34,6 +34,8 @@ namespace EmploymentApp
             builder.Services.AddTransient<EventCreateViewModel>();
             builder.Services.AddTransient<VacancyCreateViewModel>();
 
+            builder.Services.AddTransient<VacancySearchViewModel>();
+
             // Pages
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<RegistrationPage>();
@@ -46,6 +48,8 @@ namespace EmploymentApp
 
             builder.Services.AddTransient<EventCreatePage>();
             builder.Services.AddTransient<VacancyCreatePage>();
+
+            builder.Services.AddTransient<VacancySearchPage>();
 
             // Singleton services
             builder.Services.AddSingleton<AuthService>();

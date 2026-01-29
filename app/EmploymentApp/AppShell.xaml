@@ -47,4 +47,9 @@
         ContentTemplate="{DataTemplate pages:EventCreatePage}"
         Route="EventCreatePage" />
 
+    <ShellContent
+        Title="VacancySearchPage"
+        ContentTemplate="{DataTemplate pages:VacancySearchPage}"
+        Route="VacancySearchPage" />
+
 </Shell>

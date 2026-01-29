@@ -23,9 +23,15 @@
                         TextColor="Black"
                         FontSize="16"
                         VerticalOptions="Center"
-                        HorizontalOptions="Center"/>
+                        HorizontalOptions="Center">
 
-                <Label Text="События"
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NavigateToVacancySearchCommand}"/>
+                    </Label.GestureRecognizers>
+
+                </Label>
+
+                    <Label Text="События"
                        Grid.Column="1"
                        BackgroundColor="Transparent"
                        TextColor="Black"

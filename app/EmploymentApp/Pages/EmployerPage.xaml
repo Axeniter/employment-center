@@ -24,7 +24,13 @@
                         TextColor="Black"
                         FontSize="16"
                         VerticalOptions="Center"
-                        HorizontalOptions="Center"/>
+                        HorizontalOptions="Center">
+
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NavigateToVacancySearchCommand}"/>
+                    </Label.GestureRecognizers>
+                    
+                </Label>
 
                 <Label Text="Coбытия"
                        Grid.Column="1"
@@ -58,7 +64,6 @@
                   RowSpacing="30"
                   ColumnSpacing="40">
 
-                <!-- Аватарка -->
                 <Border Grid.Column="0"
                         Grid.Row="0"
                         StrokeShape="RoundRectangle 100"
@@ -69,7 +74,6 @@
                         HorizontalOptions="Start"
                         VerticalOptions="Start"
                         Margin="0,20,0,0">
-                    <!-- Отступ сверху -->
 
                     <Image Source="dotnet_bot.png"
                            Aspect="AspectFill"
@@ -78,7 +82,6 @@
 
                 </Border>
 
-                <!-- Поле с названием компании справа -->
                 <VerticalStackLayout Grid.Column="1"
                          Grid.Row="0"
                          VerticalOptions="Start"
@@ -225,10 +228,12 @@
                                          Spacing="10"
                                          VerticalOptions="Center"
                                          HorizontalOptions="Center">
+                        
                         <VerticalStackLayout IsVisible="{Binding HasNoEvents}" Spacing="10">
                             <Label Text="Нет событий" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#999"/>
                             <Label Text="Вы пока не создали ни одного события" FontSize="12" HorizontalOptions="Center" TextColor="#ccc"/>
                         </VerticalStackLayout>
+                        
                     </VerticalStackLayout>
 
                     <CollectionView ItemsSource="{Binding DisplayedVacancies}"
@@ -251,9 +256,11 @@
 
                                                 <!-- Теги -->
                                                 <CollectionView ItemsSource="{Binding Tags}" SelectionMode="None" HeightRequest="35">
+                                                    
                                                     <CollectionView.ItemsLayout>
                                                         <LinearItemsLayout Orientation="Horizontal" ItemSpacing="5"/>
                                                     </CollectionView.ItemsLayout>
+                                                    
                                                     <CollectionView.ItemTemplate>
                                                         <DataTemplate>
                                                             <Border Padding="5,2" StrokeThickness="0" StrokeShape="RoundRectangle 10" BackgroundColor="#f0f0f0">
@@ -261,6 +268,7 @@
                                                             </Border>
                                                         </DataTemplate>
                                                     </CollectionView.ItemTemplate>
+                                                    
                                                 </CollectionView>
                                             </VerticalStackLayout>
 

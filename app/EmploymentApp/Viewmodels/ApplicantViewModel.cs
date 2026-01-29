@@ -142,5 +142,11 @@ namespace EmploymentApp.Viewmodels
                 IsLoading = false;
             }
         }
+
+        [RelayCommand]
+        public async Task NavigateToVacancySearch()
+        {
+            await Shell.Current.GoToAsync("//VacancySearchPage");
+        }
     }
 }

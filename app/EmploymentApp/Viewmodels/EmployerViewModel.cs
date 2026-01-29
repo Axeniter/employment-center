@@ -61,6 +61,21 @@ namespace EmploymentApp.Viewmodels
         [JsonPropertyName("is_active")]
         public bool IsActive { get; set; }
 
+        public VacancyItemViewModel ToViewModel()
+        {
+            return new VacancyItemViewModel
+            {
+                Id = Id,
+                Title = Title,
+                Description = Description,
+                Tags = Tags ?? new(),
+                SalaryFrom = SalaryFrom,
+                SalaryTo = SalaryTo,
+                SalaryCurrency = SalaryCurrency,
+                Location = Location,
+                IsRemote = IsRemote
+            };
+        }
     }
 
     public class EventResponse
@@ -141,7 +156,7 @@ namespace EmploymentApp.Viewmodels
             _authService = authService;
 
             UpdateColors();
-            
+
             LoadData();
 
             // Инициализация коллекции событий
@@ -192,7 +207,7 @@ namespace EmploymentApp.Viewmodels
                     CompanyName = profileData.CompanyName ?? "";
                     Contacts = profileData.Contact ?? "";
                     Description = profileData.Description ?? "";
-                    
+
                     Debug.WriteLine("Profile loaded successfully");
                 }
                 else
@@ -278,7 +293,7 @@ namespace EmploymentApp.Viewmodels
 
         private async Task LoadEvents()
         {
-            try 
+            try
             {
                 var token = await _authService.GetAccessTokenAsync();
 
@@ -409,7 +424,7 @@ namespace EmploymentApp.Viewmodels
                     if (vacancyToRemove != null)
                     {
                         DisplayedVacancies.Remove(vacancyToRemove);
-                        UpdateEmptyStates(); 
+                        UpdateEmptyStates();
                     }
 
                     await Application.Current.MainPage.DisplayAlert("Успех", "Вакансия удалена", "OK");
@@ -482,5 +497,10 @@ namespace EmploymentApp.Viewmodels
             await Shell.Current.GoToAsync("//EventCreatePage");
         }
 
+        [RelayCommand]
+        public async Task NavigateToVacancySearch()
+        {
+            await Shell.Current.GoToAsync("//VacancySearchPage");
+        }
     }
 }
