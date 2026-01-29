@@ -476,5 +476,11 @@ namespace EmploymentApp.Viewmodels
             await Shell.Current.GoToAsync("//VacancyCreatePage");
         }
 
+        [RelayCommand]
+        private async Task NavigateToCreateEventPage()
+        {
+            await Shell.Current.GoToAsync("//EventCreatePage");
+        }
+
     }
 }

@@ -155,7 +155,6 @@
                             BackgroundColor="#9dfca8" 
                             TextColor="Black" 
                             FontSize="18"
-                            FontAttributes="Bold" 
                             CornerRadius="10" 
                             HeightRequest="55" 
                             Margin="0,15,0,0"/>
