@@ -158,7 +158,6 @@ namespace EmploymentApp.Viewmodels
         [RelayCommand]
         public async Task LoadData()
         {
-    
             await LoadProfile();
             await LoadVacancies();
             await LoadEvents();
@@ -472,9 +471,9 @@ namespace EmploymentApp.Viewmodels
         }
 
         [RelayCommand]
-        private async Task NavigateToCreatePage()
+        private async Task NavigateToCreateVacancyPage()
         {
-            //await Shell.Current.GoToAsync("//RegistrationPage");
+            await Shell.Current.GoToAsync("//VacancyCreatePage");
         }
 
     }

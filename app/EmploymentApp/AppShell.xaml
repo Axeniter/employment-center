@@ -37,4 +37,14 @@
         ContentTemplate="{DataTemplate pages:EmployerCreateProfilePage}"
         Route="EmployerCreateProfilePage" />
 
+    <ShellContent
+        Title="VacancyCreatePage"
+        ContentTemplate="{DataTemplate pages:VacancyCreatePage}"
+        Route="VacancyCreatePage" />
+
+    <ShellContent
+        Title="EventCreatePage"
+        ContentTemplate="{DataTemplate pages:EventCreatePage}"
+        Route="EventCreatePage" />
+
 </Shell>
