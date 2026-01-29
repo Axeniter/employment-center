@@ -471,5 +471,11 @@ namespace EmploymentApp.Viewmodels
             }
         }
 
+        [RelayCommand]
+        private async Task NavigateToCreatePage()
+        {
+            //await Shell.Current.GoToAsync("//RegistrationPage");
+        }
+
     }
 }
