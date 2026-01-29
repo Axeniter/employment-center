@@ -279,7 +279,7 @@ namespace EmploymentApp.Viewmodels
 
         private async Task LoadEvents()
         {
-            try
+            try 
             {
                 var token = await _authService.GetAccessTokenAsync();
 
@@ -388,5 +388,88 @@ namespace EmploymentApp.Viewmodels
         {
             IsVacancySelected = true;
         }
+
+        [RelayCommand]
+        private async void VacancyDelete(int id)
+        {
+            try
+            {
+                var token = await _authService.GetAccessTokenAsync();
+                if (string.IsNullOrEmpty(token))
+                {
+                    await Application.Current.MainPage.DisplayAlert("Ошибка", "Не авторизован", "OK");
+                    return;
+                }
+
+                var response = await _apiClient.DeleteAsync($"/vacancies/{id}", token);
+
+                if (response.IsSuccessStatusCode)
+                {
+
+                    var vacancyToRemove = DisplayedVacancies.FirstOrDefault(v => v.Id == id);
+                    if (vacancyToRemove != null)
+                    {
+                        DisplayedVacancies.Remove(vacancyToRemove);
+                        UpdateEmptyStates(); 
+                    }
+
+                    await Application.Current.MainPage.DisplayAlert("Успех", "Вакансия удалена", "OK");
+                    Debug.WriteLine($"Vacancy {id} deleted successfully");
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    await Application.Current.MainPage.DisplayAlert("Ошибка", $"Не удалось удалить: {response.StatusCode}", "OK");
+                    Debug.WriteLine($"Delete failed: {response.StatusCode} - {errorContent}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Delete vacancy error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert("Ошибка", $"Ошибка удаления: {ex.Message}", "OK");
+            }
+        }
+
+        [RelayCommand]
+        private async Task EventDelete(int id)
+        {
+            try
+            {
+                var token = await _authService.GetAccessTokenAsync();
+                if (string.IsNullOrEmpty(token))
+                {
+                    await Application.Current.MainPage.DisplayAlert("Ошибка", "Не авторизован", "OK");
+                    return;
+                }
+
+                var response = await _apiClient.DeleteAsync($"/events/{id}", token);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Удаляем из локальной коллекции
+                    var eventToRemove = DisplayedEvents.FirstOrDefault(e => e.Id == id);
+                    if (eventToRemove != null)
+                    {
+                        DisplayedEvents.Remove(eventToRemove);
+                        UpdateEmptyStates();
+                    }
+
+                    await Application.Current.MainPage.DisplayAlert("Успех", "Событие удалено", "OK");
+                    Debug.WriteLine($"Event {id} deleted successfully");
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    await Application.Current.MainPage.DisplayAlert("Ошибка", $"Не удалось удалить: {response.StatusCode}", "OK");
+                    Debug.WriteLine($"Delete failed: {response.StatusCode} - {errorContent}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Delete event error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert("Ошибка", $"Ошибка удаления: {ex.Message}", "OK");
+            }
+        }
+
     }
 }
