@@ -144,9 +144,15 @@ namespace EmploymentApp.Viewmodels
         }
 
         [RelayCommand]
-        public async Task NavigateToVacancySearch()
+        public async Task NavigateToVacancies()
         {
             await Shell.Current.GoToAsync("//VacancySearchPage");
+        }
+
+        [RelayCommand]
+        public async Task NavigateToEvents()
+        {
+            await Shell.Current.GoToAsync("//EventSearchPage");
         }
     }
 }

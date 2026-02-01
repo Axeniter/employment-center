@@ -3,10 +3,12 @@ using CommunityToolkit.Mvvm.Input;
 using EmploymentApp.Services;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Text.Json.Serialization;
+
 
 namespace EmploymentApp.Viewmodels
 {
-    public class VacancyItemViewModel
+    public class EventItemViewModel
     {
         public int Id { get; set; }
 
@@ -14,49 +16,32 @@ namespace EmploymentApp.Viewmodels
 
         public string Description { get; set; }
 
-        public List<string> Tags { get; set; } = new();
-
-        public int SalaryFrom { get; set; }
-
-        public int SalaryTo { get; set; }
-
-        public string SalaryCurrency { get; set; }
-
-        public string SalaryRange => $"{SalaryFrom:N0} - {SalaryTo:N0} {SalaryCurrency}";
-
         public string Location { get; set; }
 
         public bool IsRemote { get; set; }
 
         public string WorkLocation => IsRemote ? "Удаленно" : Location;
 
-        public DateTime CreatedAt { get; set; }
+        public DateTime Date { get; set; }
 
-        public VacancyItemViewModel ToViewModel()
-        {
-            return new VacancyItemViewModel
-            {
-                Id = Id,
-                Title = Title,
-                Description = Description,
-                Tags = Tags ?? new(),
-                SalaryFrom = SalaryFrom,
-                SalaryTo = SalaryTo,
-                SalaryCurrency = SalaryCurrency,
-                Location = Location,
-                IsRemote = IsRemote,
-                CreatedAt = CreatedAt
-            };
-        }
+        public string FormattedDate => Date.ToString("dd.MM.yyyy");
+
+        public string FormattedTime => Date.ToString("HH:mm");
+
+        public string FormattedDateTime => $"{FormattedDate} в {FormattedTime}";
+
+        public string EmployerId { get; set; }
+
+        public bool IsActive { get; set; }
     }
 
-    public partial class VacancySearchViewModel : ObservableObject
+    public partial class EventSearchViewModel : ObservableObject
     {
         private readonly ApiClient _apiClient;
         private readonly AuthService _authService;
 
         [ObservableProperty]
-        private ObservableCollection<VacancyItemViewModel> vacancies = new();
+        private ObservableCollection<EventItemViewModel> events = new();
 
         [ObservableProperty]
         private bool isLoading;
@@ -78,13 +63,10 @@ namespace EmploymentApp.Viewmodels
         private bool filterIsRemote = false;
 
         [ObservableProperty]
-        private string minSalaryText = string.Empty;
+        private string dateFromString = string.Empty;
 
         [ObservableProperty]
-        private string maxSalaryText = string.Empty;
-
-        [ObservableProperty]
-        private string salaryCurrency = "RUB";
+        private string dateToString = string.Empty;
 
         [ObservableProperty]
         private int currentPage = 1;
@@ -92,16 +74,16 @@ namespace EmploymentApp.Viewmodels
         [ObservableProperty]
         private int pageSize = 20;
 
-        public VacancySearchViewModel(ApiClient apiClient, AuthService authService)
+        public EventSearchViewModel(ApiClient apiClient, AuthService authService)
         {
             _apiClient = apiClient;
             _authService = authService;
 
-            LoadVacancies();
+            LoadEvents();
         }
 
         [RelayCommand]
-        public async Task LoadVacancies()
+        public async Task LoadEvents()
         {
             try
             {
@@ -111,36 +93,38 @@ namespace EmploymentApp.Viewmodels
 
                 var token = await _authService.GetAccessTokenAsync();
 
+                // Построение URL с параметрами фильтрации
                 var queryParams = BuildQueryParams();
-                var url = $"/vacancies/?{queryParams}";
+                var url = $"/events/?{queryParams}";
 
-                var response = await _apiClient.GetAsJsonAsync<List<VacancyResponse>>(url, token);
+                var response = await _apiClient.GetAsJsonAsync<List<EventResponse>>(url, token);
 
                 if (response != null)
                 {
-                    var vacancyViewModels = response
-                        .Select(v => v.ToViewModel())
+                    var eventViewModels = response
+                        .Where(e => e.IsActive)  // Фильтруем только активные события
+                        .Select(e => e.ToViewModel())
                         .ToList();
 
-                    Vacancies.Clear();
-                    foreach (var vacancy in vacancyViewModels)
+                    Events.Clear();
+                    foreach (var @event in eventViewModels)
                     {
-                        Vacancies.Add(vacancy);
+                        Events.Add(@event);
                     }
 
-                    Debug.WriteLine($"Loaded {Vacancies.Count} vacancies");
+                    Debug.WriteLine($"Loaded {Events.Count} events");
                 }
                 else
                 {
                     HasError = true;
-                    ErrorMessage = "Не удалось загрузить вакансии";
+                    ErrorMessage = "Не удалось загрузить события";
                 }
             }
             catch (Exception ex)
             {
                 HasError = true;
                 ErrorMessage = $"Ошибка: {ex.Message}";
-                Debug.WriteLine($"Error loading vacancies: {ex.Message}");
+                Debug.WriteLine($"Error loading events: {ex.Message}");
             }
             finally
             {
@@ -152,37 +136,44 @@ namespace EmploymentApp.Viewmodels
         {
             var parameters = new List<string>();
 
+            // Добавляем параметры пагинации
             parameters.Add($"page={CurrentPage}");
             parameters.Add($"limit={PageSize}");
 
+            // Поиск по названию/описанию
             if (!string.IsNullOrWhiteSpace(SearchText))
             {
                 parameters.Add($"search_text={Uri.EscapeDataString(SearchText)}");
             }
 
+            // Фильтр по локации
             if (!string.IsNullOrWhiteSpace(FilterLocation))
             {
                 parameters.Add($"location={Uri.EscapeDataString(FilterLocation)}");
             }
 
+            // Фильтр по удалённости
             if (FilterIsRemote)
             {
                 parameters.Add("is_remote=true");
             }
 
-            if (!string.IsNullOrWhiteSpace(MinSalaryText) && int.TryParse(MinSalaryText, out var minSalary))
+            // Фильтр по дате начала
+            if (!string.IsNullOrWhiteSpace(DateFromString))
             {
-                parameters.Add($"min_salary={minSalary}");
+                if (DateTime.TryParse(DateFromString, out var dateFrom))
+                {
+                    parameters.Add($"date_from={dateFrom:yyyy-MM-ddTHH:mm:ss.fffZ}");
+                }
             }
 
-            if (!string.IsNullOrWhiteSpace(MaxSalaryText) && int.TryParse(MaxSalaryText, out var maxSalary))
+            // Фильтр по дате конца
+            if (!string.IsNullOrWhiteSpace(DateToString))
             {
-                parameters.Add($"max_salary={maxSalary}");
-            }
-
-            if (!string.IsNullOrWhiteSpace(SalaryCurrency))
-            {
-                parameters.Add($"salary_currency={SalaryCurrency}");
+                if (DateTime.TryParse(DateToString, out var dateTo))
+                {
+                    parameters.Add($"date_to={dateTo:yyyy-MM-ddTHH:mm:ss.fffZ}");
+                }
             }
 
             return string.Join("&", parameters);
@@ -191,8 +182,8 @@ namespace EmploymentApp.Viewmodels
         [RelayCommand]
         public async Task ApplyFilters()
         {
-            CurrentPage = 1; 
-            await LoadVacancies();
+            CurrentPage = 1; // Сброс на первую страницу при применении фильтров
+            await LoadEvents();
         }
 
         [RelayCommand]
@@ -201,18 +192,17 @@ namespace EmploymentApp.Viewmodels
             SearchText = string.Empty;
             FilterLocation = string.Empty;
             FilterIsRemote = false;
-            MinSalaryText = string.Empty;
-            MaxSalaryText = string.Empty;
-            SalaryCurrency = "RUB";
+            DateFromString = string.Empty;
+            DateToString = string.Empty;
             CurrentPage = 1;
 
-            await LoadVacancies();
+            await LoadEvents();
         }
 
         [RelayCommand]
-        public async Task NavigateToEvents()
+        public async Task NavigateToVacancies()
         {
-            await Shell.Current.GoToAsync("//EventSearchPage");
+            await Shell.Current.GoToAsync("//VacancySearchPage");
         }
 
         [RelayCommand]

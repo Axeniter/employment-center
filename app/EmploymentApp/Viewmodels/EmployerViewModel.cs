@@ -104,6 +104,21 @@ namespace EmploymentApp.Viewmodels
         [JsonPropertyName("is_active")]
         public bool IsActive { get; set; }
 
+        public EventItemViewModel ToViewModel()
+        {
+            return new EventItemViewModel
+            {
+                Id = Id,
+                Title = Title,
+                Description = Description,
+                Location = Location,
+                IsRemote = IsRemote,
+                Date = Date,
+                EmployerId = EmployerId,
+                IsActive = IsActive
+            };
+        }
+
     }
 
     public partial class EmployerViewModel : ObservableObject
@@ -498,9 +513,16 @@ namespace EmploymentApp.Viewmodels
         }
 
         [RelayCommand]
-        public async Task NavigateToVacancySearch()
+        public async Task NavigateToVacancies()
         {
             await Shell.Current.GoToAsync("//VacancySearchPage");
         }
+
+        [RelayCommand]
+        public async Task NavigateToEvents()
+        {
+            await Shell.Current.GoToAsync("//EventSearchPage");
+        }
+
     }
 }

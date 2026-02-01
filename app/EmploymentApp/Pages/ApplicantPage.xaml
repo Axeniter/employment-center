@@ -26,18 +26,25 @@
                         HorizontalOptions="Center">
 
                     <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding NavigateToVacancySearchCommand}"/>
+                        <TapGestureRecognizer Command="{Binding NavigateToVacanciesCommand}"/>
                     </Label.GestureRecognizers>
 
                 </Label>
 
-                    <Label Text="События"
+                <Label Text="События"
                        Grid.Column="1"
                        BackgroundColor="Transparent"
                        TextColor="Black"
                        FontSize="16"
                        VerticalOptions="Center"
-                       HorizontalOptions="Start"/>
+                       HorizontalOptions="Start">
+
+
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NavigateToEventsCommand}"/>
+                    </Label.GestureRecognizers>
+
+                </Label>
 
                 <Label Text="Чат"
                        Grid.Column="3"
@@ -53,7 +60,8 @@
                        TextColor="Black"
                        FontSize="16"
                        VerticalOptions="Center"
-                       HorizontalOptions="Center"/>
+                       HorizontalOptions="Center"
+                       FontAttributes="Bold"/>
 
             </Grid>
 
