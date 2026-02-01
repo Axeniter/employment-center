@@ -74,56 +74,48 @@ namespace EmploymentApp.Viewmodels
         [RelayCommand]
         public async Task SaveVacancy()
         {
-            // Валидация: Название вакансии
             if (string.IsNullOrWhiteSpace(Title))
             {
                 await Application.Current.MainPage.DisplayAlert("Ошибка", "Введите название вакансии", "OK");
                 return;
             }
 
-            // Валидация: Описание
             if (string.IsNullOrWhiteSpace(Description))
             {
                 await Application.Current.MainPage.DisplayAlert("Ошибка", "Введите описание вакансии", "OK");
                 return;
             }
 
-            // Валидация: Локация
             if (string.IsNullOrWhiteSpace(Location))
             {
                 await Application.Current.MainPage.DisplayAlert("Ошибка", "Введите локацию", "OK");
                 return;
             }
 
-            // Валидация: Зарплата от (наличие)
             if (string.IsNullOrWhiteSpace(SalaryFromString))
             {
                 await Application.Current.MainPage.DisplayAlert("Ошибка", "Введите зарплату 'от'", "OK");
                 return;
             }
 
-            // Валидация: Зарплата до (наличие)
             if (string.IsNullOrWhiteSpace(SalaryToString))
             {
                 await Application.Current.MainPage.DisplayAlert("Ошибка", "Введите зарплату 'до'", "OK");
                 return;
             }
 
-            // Валидация: Зарплата от (число)
             if (!int.TryParse(SalaryFromString, out int salaryFrom))
             {
                 await Application.Current.MainPage.DisplayAlert("Ошибка", "Зарплата 'от' должна быть числом", "OK");
                 return;
             }
 
-            // Валидация: Зарплата до (число)
             if (!int.TryParse(SalaryToString, out int salaryTo))
             {
                 await Application.Current.MainPage.DisplayAlert("Ошибка", "Зарплата 'до' должна быть числом", "OK");
                 return;
             }
 
-            // Валидация: Зарплата от <= до
             if (salaryFrom > salaryTo)
             {
                 await Application.Current.MainPage.DisplayAlert("Ошибка", "Зарплата 'от' не может быть больше зарплаты 'до'", "OK");
@@ -142,7 +134,6 @@ namespace EmploymentApp.Viewmodels
                     return;
                 }
 
-                // Разбираем теги по запятой
                 var tags = string.IsNullOrEmpty(TagsText)
                     ? new List<string>()
                     : TagsText.Split(',')
@@ -172,10 +163,8 @@ namespace EmploymentApp.Viewmodels
                         "OK"
                     );
 
-                    // Очищаем форму
                     ClearForm();
 
-                    // Переходим на предыдущую страницу
                     await Shell.Current.GoToAsync("//EmployerPage");
 
                     Debug.WriteLine("Vacancy created successfully");
