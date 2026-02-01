@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using EmploymentApp.Services;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Text.Json.Serialization;
 
 namespace EmploymentApp.Viewmodels
 {
@@ -68,8 +67,30 @@ namespace EmploymentApp.Viewmodels
         [ObservableProperty]
         private string errorMessage;
 
+        // Параметры фильтрации
         [ObservableProperty]
-        private string searchQuery;
+        private string searchText = string.Empty;
+
+        [ObservableProperty]
+        private string filterLocation = string.Empty;
+
+        [ObservableProperty]
+        private bool filterIsRemote = false;
+
+        [ObservableProperty]
+        private string minSalaryText = string.Empty;
+
+        [ObservableProperty]
+        private string maxSalaryText = string.Empty;
+
+        [ObservableProperty]
+        private string salaryCurrency = "RUB";
+
+        [ObservableProperty]
+        private int currentPage = 1;
+
+        [ObservableProperty]
+        private int pageSize = 20;
 
         public VacancySearchViewModel(ApiClient apiClient, AuthService authService)
         {
@@ -90,7 +111,10 @@ namespace EmploymentApp.Viewmodels
 
                 var token = await _authService.GetAccessTokenAsync();
 
-                var response = await _apiClient.GetAsJsonAsync<List<VacancyResponse>>("/vacancies/", token);
+                var queryParams = BuildQueryParams();
+                var url = $"/vacancies/?{queryParams}";
+
+                var response = await _apiClient.GetAsJsonAsync<List<VacancyResponse>>(url, token);
 
                 if (response != null)
                 {
@@ -99,7 +123,6 @@ namespace EmploymentApp.Viewmodels
                         .ToList();
 
                     Vacancies.Clear();
-
                     foreach (var vacancy in vacancyViewModels)
                     {
                         Vacancies.Add(vacancy);
@@ -123,6 +146,67 @@ namespace EmploymentApp.Viewmodels
             {
                 IsLoading = false;
             }
+        }
+
+        private string BuildQueryParams()
+        {
+            var parameters = new List<string>();
+
+            parameters.Add($"page={CurrentPage}");
+            parameters.Add($"limit={PageSize}");
+
+            if (!string.IsNullOrWhiteSpace(SearchText))
+            {
+                parameters.Add($"search_text={Uri.EscapeDataString(SearchText)}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(FilterLocation))
+            {
+                parameters.Add($"location={Uri.EscapeDataString(FilterLocation)}");
+            }
+
+            if (FilterIsRemote)
+            {
+                parameters.Add("is_remote=true");
+            }
+
+            if (!string.IsNullOrWhiteSpace(MinSalaryText) && int.TryParse(MinSalaryText, out var minSalary))
+            {
+                parameters.Add($"min_salary={minSalary}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(MaxSalaryText) && int.TryParse(MaxSalaryText, out var maxSalary))
+            {
+                parameters.Add($"max_salary={maxSalary}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(SalaryCurrency))
+            {
+                parameters.Add($"salary_currency={SalaryCurrency}");
+            }
+
+            return string.Join("&", parameters);
+        }
+
+        [RelayCommand]
+        public async Task ApplyFilters()
+        {
+            CurrentPage = 1; 
+            await LoadVacancies();
+        }
+
+        [RelayCommand]
+        public async Task ResetFilters()
+        {
+            SearchText = string.Empty;
+            FilterLocation = string.Empty;
+            FilterIsRemote = false;
+            MinSalaryText = string.Empty;
+            MaxSalaryText = string.Empty;
+            SalaryCurrency = "RUB";
+            CurrentPage = 1;
+
+            await LoadVacancies();
         }
 
         [RelayCommand]
