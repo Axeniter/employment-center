@@ -8,17 +8,7 @@ using System.Text.Json.Serialization;
 
 namespace EmploymentApp.Viewmodels
 {
-    public class EmployerInfoViewModel
-    {
-        public string Id { get; set; }
-
-        public string Email { get; set; }
-
-        public string CompanyName { get; set; }
-
-        public string PhoneNumber { get; set; }
-    }
-
+    
     public class VacancyDetailResponse
     {
         [JsonPropertyName("id")]
@@ -65,28 +55,34 @@ namespace EmploymentApp.Viewmodels
         private int vacancyId;
 
         [ObservableProperty]
-        private string title;
+        private string title = string.Empty;
 
         [ObservableProperty]
-        private string description;
+        private string description = string.Empty;
 
         [ObservableProperty]
         private ObservableCollection<string> tags = new();
 
         [ObservableProperty]
-        private string salaryRange;
+        private string tagsAsString = string.Empty;
 
         [ObservableProperty]
-        private string location;
+        private string salaryRange = string.Empty;
+
+        [ObservableProperty]
+        private string location = string.Empty;
 
         [ObservableProperty]
         private bool isRemote;
 
         [ObservableProperty]
-        private string workLocation;
+        private string workType = "Не указано";
 
         [ObservableProperty]
-        private string employerId;
+        private string workLocation = string.Empty;
+
+        [ObservableProperty]
+        private string employerId = string.Empty;
 
         [ObservableProperty]
         private bool isLoading;
@@ -95,10 +91,10 @@ namespace EmploymentApp.Viewmodels
         private bool hasError;
 
         [ObservableProperty]
-        private string errorMessage;
+        private string errorMessage = string.Empty;
 
         [ObservableProperty]
-        private string userRole; // "applicant" или "employer"
+        private string userRole = string.Empty;
 
         [ObservableProperty]
         private bool isApplicant;
@@ -109,15 +105,25 @@ namespace EmploymentApp.Viewmodels
         [ObservableProperty]
         private string applyButtonText = "ОТКЛИКНУТЬСЯ";
 
+        // Информация о работодателе
+        [ObservableProperty]
+        private string companyName = string.Empty;
+
+        [ObservableProperty]
+        private string companyDescription = string.Empty;
+
+        [ObservableProperty]
+        private string companyContact = string.Empty;
+
         public VacancyDetailViewModel(ApiClient apiClient, AuthService authService)
         {
             _apiClient = apiClient;
             _authService = authService;
-
-            LoadVacancyDetails();
         }
 
-        // Автоматически вызывается когда меняется VacancyId
+        /// <summary>
+        /// Автоматически вызывается когда меняется VacancyId из QueryProperty
+        /// </summary>
         partial void OnVacancyIdChanged(int value)
         {
             if (value > 0)
@@ -135,9 +141,22 @@ namespace EmploymentApp.Viewmodels
                 HasError = false;
                 ErrorMessage = string.Empty;
 
+                if (VacancyId <= 0)
+                {
+                    HasError = true;
+                    ErrorMessage = "Некорректный ID вакансии";
+                    return;
+                }
+
                 var token = await _authService.GetAccessTokenAsync();
 
-                // Получаем роль пользователя
+                if (string.IsNullOrEmpty(token))
+                {
+                    HasError = true;
+                    ErrorMessage = "Не авторизованы";
+                    return;
+                }
+
                 UserRole = await _authService.GetUserRoleAsync();
                 IsApplicant = UserRole?.ToLower() == "applicant";
 
@@ -145,26 +164,41 @@ namespace EmploymentApp.Viewmodels
 
                 if (response != null)
                 {
-                    Title = response.Title;
-                    Description = response.Description;
+                    Title = response.Title ?? string.Empty;
+                    Description = response.Description ?? string.Empty;
                     SalaryRange = $"{response.SalaryFrom:N0} - {response.SalaryTo:N0} {response.SalaryCurrency}";
-                    Location = response.Location;
+                    Location = response.Location ?? string.Empty;
                     IsRemote = response.IsRemote;
                     WorkLocation = IsRemote ? "Удаленно" : Location;
-                    EmployerId = response.EmployerId;
+                    WorkType = IsRemote ? "Удаленная работа" : "Не удаленная";
+                    EmployerId = response.EmployerId ?? string.Empty;
 
                     Tags.Clear();
-                    foreach (var tag in response.Tags)
+                    if (response.Tags != null && response.Tags.Count > 0)
                     {
-                        Tags.Add(tag);
+                        foreach (var tag in response.Tags)
+                        {
+                            Tags.Add(tag);
+                        }
+                        TagsAsString = string.Join(", ", response.Tags);
+                    }
+                    else
+                    {
+                        TagsAsString = "Не указаны";
                     }
 
-                    Debug.WriteLine("Vacancy details loaded successfully");
+                    Debug.WriteLine($"Loaded vacancy {VacancyId}: {Title}");
+
+                    if (!string.IsNullOrEmpty(EmployerId))
+                    {
+                        await LoadEmployerProfile(EmployerId, token);
+                    }
                 }
                 else
                 {
                     HasError = true;
                     ErrorMessage = "Не удалось загрузить детали вакансии";
+                    Debug.WriteLine($"Response is null for vacancy {VacancyId}");
                 }
             }
             catch (Exception ex)
@@ -179,10 +213,41 @@ namespace EmploymentApp.Viewmodels
             }
         }
 
+        private async Task LoadEmployerProfile(string employerId, string token)
+        {
+            try
+            {
+                var profileResponse = await _apiClient.GetAsJsonAsync<EmployerProfileResponse>($"/profile/{employerId}", token);
+
+                if (profileResponse != null)
+                {
+                    CompanyName = profileResponse.CompanyName ?? "Компания не указана";
+                    CompanyDescription = profileResponse.Description ?? "Описание отсутствует";
+                    CompanyContact = profileResponse.Contact ?? "Контакт не указан";
+
+                    Debug.WriteLine($"Loaded employer profile: {CompanyName}");
+                }
+                else
+                {
+                    CompanyName = "Не удалось загрузить информацию";
+                    CompanyDescription = string.Empty;
+                    CompanyContact = string.Empty;
+                    Debug.WriteLine($"Employer profile response is null for {employerId}");
+                }
+            }
+            catch (Exception ex)
+            {
+                CompanyName = "Ошибка загрузки";
+                CompanyDescription = ex.Message;
+                CompanyContact = string.Empty;
+                Debug.WriteLine($"Error loading employer profile: {ex.Message}");
+            }
+        }
+
         [RelayCommand]
         public async Task GoBack()
         {
-            await Shell.Current.GoToAsync("..");
+            await Shell.Current.GoToAsync("//VacancySearchPage");
         }
     }
 }

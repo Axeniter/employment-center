@@ -9,7 +9,7 @@
         <!-- Основное содержимое -->
         <Grid ColumnDefinitions="250,*" RowDefinitions="*">
 
-            <!-- Левая панель (серая область) -->
+            <!-- Левая панель -->
             <Border Grid.Column="0" 
                     Grid.Row="0"
                     Padding="15"
@@ -18,14 +18,17 @@
 
                 <Grid RowDefinitions="Auto,*,Auto">
 
+                    <VerticalStackLayout Grid.Row="0"></VerticalStackLayout>
+                    
                     <!-- Кнопка откликнуться (только для applicant) -->
-                    <VerticalStackLayout Grid.Row="0" Spacing="15">
+                    <VerticalStackLayout Grid.Row="1" Spacing="15">
                         <Button Text="{Binding ApplyButtonText}"
                                 IsEnabled="{Binding IsApplicant}"
                                 Command="{Binding ApplyToVacancyCommand}"
                                 BackgroundColor="{Binding IsApplicant, StringFormat='{0:CHANGE_THIS}'}"
                                 TextColor="Black"
                                 FontAttributes="Bold"
+                                HeightRequest="100"
                                 CornerRadius="8"
                                 Padding="10,10"
                                 IsVisible="{Binding IsApplicant}"/>
@@ -33,48 +36,14 @@
                         <!-- Если уже откликнулся -->
                         <Label Text="Вы уже откликнулись на эту вакансию"
                                IsVisible="{Binding HasApplied}"
-                               FontSize="12"
+                               FontSize="14"
                                TextColor="Green"
                                HorizontalTextAlignment="Center"
                                FontAttributes="Bold"/>
-                        
-                    </VerticalStackLayout>
-
-                    <!-- Информация о работодателе (в середине) -->
-                    <VerticalStackLayout Grid.Row="1" 
-                                        Spacing="15"
-                                        VerticalOptions="Center"
-                                        Padding="0,20">
-
-                        <Label Text="О работодателе" 
-                               FontSize="14" 
-                               FontAttributes="Bold"
-                               TextColor="Black"/>
-
-                        <VerticalStackLayout BackgroundColor="White" 
-                                            Padding="10"
-                                            Spacing="8"
-                                            >
-
-                            <Label Text="Информация о работодателе"
-                                   FontSize="12"
-                                   TextColor="#999999"
-                                   HorizontalTextAlignment="Center"/>
-
-                            <!-- Здесь можно добавить информацию о работодателе позже -->
-                            <Label Text="ID работодателя:"
-                                   FontSize="11"
-                                   TextColor="Black"/>
-                            <Label Text="{Binding EmployerId}"
-                                   FontSize="10"
-                                   TextColor="#666666"
-                                   LineBreakMode="WordWrap"/>
-
-                        </VerticalStackLayout>
 
                     </VerticalStackLayout>
 
-                    <!-- Кнопка назад (в конце) -->
+                    <!-- Кнопка назад -->
                     <Button Grid.Row="2"
                             Text="НАЗАД"
                             Command="{Binding GoBackCommand}"
@@ -88,7 +57,6 @@
 
             </Border>
 
-            <!-- Правая панель со скроллом (детали вакансии) -->
             <ScrollView Grid.Column="1" 
                         Grid.Row="0">
 
@@ -111,50 +79,32 @@
                     <!-- Локация и удалённость -->
                     <VerticalStackLayout Spacing="5">
                         <Label Text="Место работы" 
-                               FontSize="12" 
+                               FontSize="16" 
                                FontAttributes="Bold"
                                TextColor="Black"/>
+
                         <Label Text="{Binding WorkLocation}" 
-                               FontSize="14" 
+                               FontSize="16" 
                                TextColor="Gray"/>
                     </VerticalStackLayout>
 
                     <!-- Теги -->
-                    <VerticalStackLayout Spacing="10">
+                    <VerticalStackLayout Spacing="5">
                         <Label Text="Теги" 
-                               FontSize="12" 
+                               FontSize="16" 
                                FontAttributes="Bold"
                                TextColor="Black"/>
 
-                        <CollectionView ItemsSource="{Binding Tags}" 
-                                        SelectionMode="None" 
-                                        HeightRequest="50">
-
-                            <CollectionView.ItemsLayout>
-                                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="8"/>
-                            </CollectionView.ItemsLayout>
-
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Padding="8,4" 
-                                            StrokeThickness="0" 
-                                            StrokeShape="RoundRectangle 15" 
-                                            BackgroundColor="#9dfca8">
-                                        <Label Text="{Binding .}" 
-                                               FontSize="12"
-                                               TextColor="Black"
-                                               FontAttributes="Bold"/>
-                                    </Border>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-
-                        </CollectionView>
+                        <Label Text="{Binding TagsAsString}" 
+                               FontSize="16"
+                               TextColor="Gray"
+                               LineBreakMode="WordWrap"/>
                     </VerticalStackLayout>
 
                     <!-- Описание вакансии -->
                     <VerticalStackLayout Spacing="10">
                         <Label Text="Описание вакансии" 
-                               FontSize="14" 
+                               FontSize="16" 
                                FontAttributes="Bold"
                                TextColor="Black"/>
 
@@ -180,7 +130,7 @@
                     <!-- Дополнительная информация -->
                     <VerticalStackLayout Spacing="10">
                         <Label Text="Дополнительная информация" 
-                               FontSize="14" 
+                               FontSize="16" 
                                FontAttributes="Bold"
                                TextColor="Black"/>
 
@@ -188,15 +138,77 @@
 
                             <Label Grid.Row="0" Grid.Column="0"
                                    Text="Тип занятости:"
-                                   FontSize="12"
+                                   FontSize="16"
                                    TextColor="Black"
                                    FontAttributes="Bold"/>
                             <Label Grid.Row="0" Grid.Column="1"
-                                   Text="{Binding IsRemote}"
-                                   FontSize="12"
+                                   Text="{Binding WorkType}"
+                                   FontSize="14"
                                    TextColor="Gray"/>
 
                         </Grid>
+                    </VerticalStackLayout>
+
+                    <!-- Разделитель -->
+                    <BoxView HeightRequest="2" 
+                             BackgroundColor="#e0e0e0" 
+                             Margin="0,20"/>
+
+                    <!-- Информация о работодателе -->
+                    <VerticalStackLayout Spacing="15">
+                        <Label Text="О компании" 
+                               FontSize="18" 
+                               FontAttributes="Bold"
+                               TextColor="Black"/>
+
+                        <Frame BorderColor="#e0e0e0" 
+                               CornerRadius="10" 
+                               Padding="20"
+                               HasShadow="False"
+                               BackgroundColor="White">
+
+                            <VerticalStackLayout Spacing="15">
+
+                                <!-- Название компании -->
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="Название компании" 
+                                           FontSize="14" 
+                                           FontAttributes="Bold"
+                                           TextColor="Black"/>
+                                    <Label Text="{Binding CompanyName}" 
+                                           FontSize="16"
+                                           TextColor="Gray"
+                                           LineBreakMode="WordWrap"/>
+                                </VerticalStackLayout>
+
+                                <!-- Описание компании -->
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="Описание" 
+                                           FontSize="14" 
+                                           FontAttributes="Bold"
+                                           TextColor="Black"/>
+                                    <Label Text="{Binding CompanyDescription}" 
+                                           FontSize="15"
+                                           TextColor="Gray"
+                                           LineBreakMode="WordWrap"/>
+                                </VerticalStackLayout>
+
+                                <!-- Контакт -->
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="Контакт" 
+                                           FontSize="14" 
+                                           FontAttributes="Bold"
+                                           TextColor="Black"/>
+                                    <Label Text="{Binding CompanyContact}" 
+                                           FontSize="15"
+                                           TextColor="Gray"
+                                           LineBreakMode="WordWrap"/>
+                                </VerticalStackLayout>
+
+                            </VerticalStackLayout>
+
+                        </Frame>
+
                     </VerticalStackLayout>
 
                 </VerticalStackLayout>
