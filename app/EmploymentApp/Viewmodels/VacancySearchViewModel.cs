@@ -230,5 +230,12 @@ namespace EmploymentApp.Viewmodels
             else if (await _authService.GetUserRoleAsync() == "employer")
                 await Shell.Current.GoToAsync("//EmployerPage");
         }
+
+
+        [RelayCommand]
+        public async Task SelectVacancy(int vacancyId)
+        {
+            await Shell.Current.GoToAsync($"///vacancydetail?id={vacancyId}");
+        }
     }
 }

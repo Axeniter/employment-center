@@ -13,9 +13,19 @@
         Route="LoginPage" />
     
     <ShellContent
+        Title="Vacancies page"
+        ContentTemplate="{DataTemplate pages:VacancySearchPage}"
+        Route="VacancySearchPage" />
+
+    <ShellContent
+        Title="Events page"
+        ContentTemplate="{DataTemplate pages:EventSearchPage}"
+        Route="EventSearchPage" />
+
+    <ShellContent
         Title="Applicant page"
         ContentTemplate="{DataTemplate pages:ApplicantPage}"
-        Route="ApplicantPage"/>
+        Route="ApplicantPage" />
 
     <ShellContent
         Title="Employer page"
@@ -48,13 +58,8 @@
         Route="EventCreatePage" />
 
     <ShellContent
-        Title="VacancySearchPage"
-        ContentTemplate="{DataTemplate pages:VacancySearchPage}"
-        Route="VacancySearchPage" />
-
-    <ShellContent
-        Title="EventSearchPage"
-        ContentTemplate="{DataTemplate pages:EventSearchPage}"
-        Route="EventSearchPage" />
+        Title="VacancyDetailPage"
+        ContentTemplate="{DataTemplate pages:VacancyDetailPage}"
+        Route="vacancydetail" />
 
 </Shell>

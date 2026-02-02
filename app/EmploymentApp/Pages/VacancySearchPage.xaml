@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="EmploymentApp.Pages.VacancySearchPage"
+             xmlns:local="clr-namespace:EmploymentApp.Viewmodels"
              Title="VacancySearchPage">
 
     <Grid RowDefinitions="Auto,*">
@@ -182,8 +183,7 @@
 
                         <!-- Список вакансий -->
                         <CollectionView ItemsSource="{Binding Vacancies}"
-                                        SelectionMode="None"
-                                        SelectionChangedCommand="{Binding .}">
+                                        SelectionMode="None">
 
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
@@ -192,6 +192,12 @@
                                                 StrokeThickness="1" 
                                                 StrokeShape="RoundRectangle 10" 
                                                 Stroke="#e0e0e0">
+
+                                            <!-- Добавляем TapGestureRecognizer на Border -->
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type local:VacancySearchViewModel}}, Path=SelectVacancyCommand}"
+                                                                      CommandParameter="{Binding Id}"/>
+                                            </Border.GestureRecognizers>
 
                                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
 
