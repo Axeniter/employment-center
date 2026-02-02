@@ -87,9 +87,9 @@ namespace EmploymentApp.Viewmodels
 
         public string StatusText => Status switch
         {
-            "accepted" => "Принята",
-            "rejected" => "Отклонена",
-            "pending" => "На рассмотрении",
+            "accepted" => "✓ Принята",
+            "rejected" => "✗ Отклонена",
+            "pending" => "⏳ На рассмотрении",
             _ => Status
         };
     }
@@ -128,6 +128,9 @@ namespace EmploymentApp.Viewmodels
 
         [ObservableProperty]
         private ObservableCollection<VacancyResponseViewModel> myResponses = new();
+
+        [ObservableProperty]
+        private bool hasResponses = false;
 
         public ApplicantViewModel(ApiClient apiClient, AuthService authService)
         {
@@ -238,15 +241,18 @@ namespace EmploymentApp.Viewmodels
                         MyResponses.Add(responseViewModel);
                     }
 
+                    HasResponses = true;
                     Debug.WriteLine($"Loaded {MyResponses.Count} responses");
                 }
                 else
                 {
+                    HasResponses = false;
                     Debug.WriteLine("No responses found");
                 }
             }
             catch (Exception ex)
             {
+                HasResponses = false;
                 Debug.WriteLine($"Load responses error: {ex.Message}");
             }
         }
