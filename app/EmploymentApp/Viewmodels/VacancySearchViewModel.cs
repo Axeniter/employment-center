@@ -216,12 +216,6 @@ namespace EmploymentApp.Viewmodels
         }
 
         [RelayCommand]
-        public async Task NavigateToChat()
-        {
-            await Shell.Current.GoToAsync("chat");
-        }
-
-        [RelayCommand]
         public async Task NavigateToProfile()
         {
             if (await _authService.GetUserRoleAsync() == "applicant")
@@ -230,7 +224,6 @@ namespace EmploymentApp.Viewmodels
             else if (await _authService.GetUserRoleAsync() == "employer")
                 await Shell.Current.GoToAsync("//EmployerPage");
         }
-
 
         [RelayCommand]
         public async Task SelectVacancy(int vacancyId)

@@ -245,6 +245,86 @@ namespace EmploymentApp.Viewmodels
         }
 
         [RelayCommand]
+        public async Task ApplyToVacancy()
+        {
+            try
+            {
+                IsLoading = true;
+
+                var token = await _authService.GetAccessTokenAsync();
+                if (string.IsNullOrEmpty(token))
+                {
+                    await Application.Current!.MainPage!.DisplayAlert(
+                        "Ошибка",
+                        "Вы не авторизованы",
+                        "OK"
+                    );
+                    return;
+                }
+
+                // POST запрос на отклик вакансии
+                var response = await _apiClient.PostAsync(
+                    $"/responses/vacancy/{VacancyId}",
+                    new { },
+                    token
+                );
+
+                if (response.IsSuccessStatusCode)
+                {
+                    HasApplied = true;
+                    ApplyButtonText = "ОТКЛИКНУЛИСЬ ✓";
+
+                    await Application.Current!.MainPage!.DisplayAlert(
+                        "Успех",
+                        "Вы успешно откликнулись на вакансию!",
+                        "OK"
+                    );
+                    Debug.WriteLine($"Successfully applied to vacancy {VacancyId}");
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    Debug.WriteLine($"Apply error: {response.StatusCode} - {errorContent}");
+
+                    // Проверяем если ошибка что уже откликнулись
+                    if (response.StatusCode == System.Net.HttpStatusCode.BadRequest &&
+                        errorContent.Contains("already responded"))
+                    {
+                        HasApplied = true;
+                        ApplyButtonText = "ОТКЛИКНУЛИСЬ ✓";
+
+                        await Application.Current!.MainPage!.DisplayAlert(
+                            "Информация",
+                            "Вы уже откликнулись на эту вакансию",
+                            "OK"
+                        );
+                    }
+                    else
+                    {
+                        await Application.Current!.MainPage!.DisplayAlert(
+                            "Ошибка",
+                            "Не удалось откликнуться на вакансию",
+                            "OK"
+                        );
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error applying to vacancy: {ex.Message}");
+                await Application.Current!.MainPage!.DisplayAlert(
+                    "Ошибка",
+                    $"Ошибка: {ex.Message}",
+                    "OK"
+                );
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        [RelayCommand]
         public async Task GoBack()
         {
             await Shell.Current.GoToAsync("//VacancySearchPage");

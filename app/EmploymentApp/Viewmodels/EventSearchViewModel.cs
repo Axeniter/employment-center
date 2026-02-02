@@ -205,11 +205,6 @@ namespace EmploymentApp.Viewmodels
             await Shell.Current.GoToAsync("//VacancySearchPage");
         }
 
-        [RelayCommand]
-        public async Task NavigateToChat()
-        {
-            await Shell.Current.GoToAsync("chat");
-        }
 
         [RelayCommand]
         public async Task NavigateToProfile()
