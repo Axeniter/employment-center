@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EmploymentApp.Services;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
 
@@ -31,6 +32,66 @@ namespace EmploymentApp.Viewmodels
 
         [JsonPropertyName("skills")]
         public List<string> Skills { get; set; }
+    }
+
+    public class VacancyTitleResponse
+    {
+        [JsonPropertyName("title")]
+        public string Title { get; set; }
+    }
+
+    public class VacancyResponseItem
+    {
+        [JsonPropertyName("vacancy_id")]
+        public int VacancyId { get; set; }
+
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("applicant_id")]
+        public string ApplicantId { get; set; }
+
+        [JsonPropertyName("status")]
+        public string Status { get; set; }
+
+        [JsonPropertyName("created_at")]
+        public string CreatedAt { get; set; }
+    }
+
+    public class VacancyResponseViewModel : ObservableObject
+    {
+        public int VacancyId { get; set; }
+        public int Id { get; set; }
+
+        private string _status = "pending";
+        public string Status
+        {
+            get => _status;
+            set => SetProperty(ref _status, value);
+        }
+
+        private string _vacancyTitle = "Загрузка...";
+        public string VacancyTitle
+        {
+            get => _vacancyTitle;
+            set => SetProperty(ref _vacancyTitle, value);
+        }
+
+        public string StatusColor => Status switch
+        {
+            "accepted" => "#4CAF50",  // Зелёный
+            "rejected" => "#F44336",  // Красный
+            "pending" => "#FFC107",   // Оранжевый
+            _ => "#999999"
+        };
+
+        public string StatusText => Status switch
+        {
+            "accepted" => "Принята",
+            "rejected" => "Отклонена",
+            "pending" => "На рассмотрении",
+            _ => Status
+        };
     }
 
     public partial class ApplicantViewModel : ObservableObject
@@ -65,6 +126,9 @@ namespace EmploymentApp.Viewmodels
         [ObservableProperty]
         private bool isLoading = false;
 
+        [ObservableProperty]
+        private ObservableCollection<VacancyResponseViewModel> myResponses = new();
+
         public ApplicantViewModel(ApiClient apiClient, AuthService authService)
         {
             _apiClient = apiClient;
@@ -88,7 +152,7 @@ namespace EmploymentApp.Viewmodels
 
                 if (string.IsNullOrEmpty(token))
                 {
-                    await Application.Current.MainPage.DisplayAlert(
+                    await Application.Current!.MainPage!.DisplayAlert(
                         "Ошибка",
                         "Токен не найден",
                         "OK"
@@ -118,10 +182,13 @@ namespace EmploymentApp.Viewmodels
                     }
 
                     Debug.WriteLine("Profile loaded successfully");
+
+                    // Загружаем мои отклики
+                    await LoadMyResponses(token);
                 }
                 else
                 {
-                    await Application.Current.MainPage.DisplayAlert(
+                    await Application.Current!.MainPage!.DisplayAlert(
                         "Ошибка",
                         "Не удалось загрузить профиль",
                         "OK"
@@ -131,7 +198,7 @@ namespace EmploymentApp.Viewmodels
             catch (Exception ex)
             {
                 Debug.WriteLine($"Load profile error: {ex.Message}");
-                await Application.Current.MainPage.DisplayAlert(
+                await Application.Current!.MainPage!.DisplayAlert(
                     "Ошибка",
                     $"Ошибка загрузки профиля: {ex.Message}",
                     "OK"
@@ -140,6 +207,74 @@ namespace EmploymentApp.Viewmodels
             finally
             {
                 IsLoading = false;
+            }
+        }
+
+        private async Task LoadMyResponses(string token)
+        {
+            try
+            {
+                var responses = await _apiClient.GetAsJsonAsync<List<VacancyResponseItem>>(
+                    "/responses/me",
+                    token
+                );
+
+                MyResponses.Clear();
+
+                if (responses != null && responses.Count > 0)
+                {
+                    foreach (var response in responses)
+                    {
+                        var responseViewModel = new VacancyResponseViewModel
+                        {
+                            VacancyId = response.VacancyId,
+                            Id = response.Id,
+                            Status = response.Status ?? "pending"
+                        };
+
+                        // Загружаем название вакансии
+                        await LoadVacancyTitle(responseViewModel, token);
+
+                        MyResponses.Add(responseViewModel);
+                    }
+
+                    Debug.WriteLine($"Loaded {MyResponses.Count} responses");
+                }
+                else
+                {
+                    Debug.WriteLine("No responses found");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Load responses error: {ex.Message}");
+            }
+        }
+
+        private async Task LoadVacancyTitle(VacancyResponseViewModel response, string token)
+        {
+            try
+            {
+                var vacancyData = await _apiClient.GetAsJsonAsync<VacancyTitleResponse>(
+                    $"/vacancies/{response.VacancyId}",
+                    token
+                );
+
+                if (vacancyData != null && !string.IsNullOrEmpty(vacancyData.Title))
+                {
+                    response.VacancyTitle = vacancyData.Title;
+                    Debug.WriteLine($"Loaded title for vacancy {response.VacancyId}: {vacancyData.Title}");
+                }
+                else
+                {
+                    response.VacancyTitle = $"Вакансия #{response.VacancyId}";
+                    Debug.WriteLine($"Title not found for vacancy {response.VacancyId}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Load vacancy title error for {response.VacancyId}: {ex.Message}");
+                response.VacancyTitle = $"Вакансия #{response.VacancyId}";
             }
         }
 

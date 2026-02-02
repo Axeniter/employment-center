@@ -39,7 +39,6 @@
                        VerticalOptions="Center"
                        HorizontalOptions="Start">
 
-
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding NavigateToEventsCommand}"/>
                     </Label.GestureRecognizers>
@@ -175,6 +174,72 @@
                 </VerticalStackLayout>
 
             </Grid>
+
+            <!-- Раздел с откликами -->
+            <VerticalStackLayout Padding="20,30" Spacing="15" IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}, ConverterParameter=true}">
+
+                <Label Text="Мои отклики"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="Black"/>
+
+                <!-- Список откликов -->
+                <CollectionView ItemsSource="{Binding MyResponses}"
+                                SelectionMode="None">
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <VerticalStackLayout Padding="0,5">
+                                <Border Padding="15"
+                                                    StrokeThickness="1"
+                                                    StrokeShape="RoundRectangle 10"
+                                                    Stroke="#e0e0e0"
+                                                    Margin="0,8">
+
+                                    <Grid RowDefinitions="Auto" ColumnDefinitions="*, Auto" ColumnSpacing="15">
+
+                                        <!-- Название вакансии -->
+                                        <Label Grid.Row="0" Grid.Column="0"
+                                                           Text="{Binding VacancyTitle}"
+                                                           FontSize="16"
+                                                           FontAttributes="Bold"
+                                                           TextColor="Black"
+                                                           LineBreakMode="WordWrap"
+                                                           VerticalOptions="Center"/>
+
+                                        <!-- Статус -->
+                                        <Frame Grid.Row="0" Grid.Column="1"
+                                                           BorderColor="{Binding StatusColor}"
+                                                           BackgroundColor="Transparent"
+                                                           CornerRadius="8"
+                                                           Padding="12,6"
+                                                           HasShadow="False"
+                                                           HorizontalOptions="End">
+
+                                            <Label Text="{Binding StatusText}"
+                                                               FontSize="12"
+                                                               FontAttributes="Bold"
+                                                               TextColor="{Binding StatusColor}"/>
+
+                                        </Frame>
+
+                                    </Grid>
+                            
+                                </Border>
+                            </VerticalStackLayout>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+
+                </CollectionView>
+
+                <!-- Сообщение если нет откликов -->
+                <Label Text="У вас ещё нет откликов"
+                       FontSize="14"
+                       TextColor="Gray"
+                       HorizontalTextAlignment="Center"
+                       IsVisible="{Binding MyResponses.Count, Converter={StaticResource InvertedBoolConverter}, ConverterParameter=true}"/>
+
+            </VerticalStackLayout>
 
         </VerticalStackLayout>
 
