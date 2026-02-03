@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="EmploymentApp.Pages.VacancyDetailEmployerPage"
+             Title="Детали Вакансии">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                               IsVisible="{Binding IsLoading}"
+                               Color="#9dfca8"
+                               Margin="0,20,0,0"/>
+
+            <!-- Информация о вакансии -->
+            <VerticalStackLayout IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}" Spacing="10">
+
+                <!-- Название вакансии -->
+                <Label Text="{Binding VacancyTitle}"
+                       FontSize="24"
+                       FontAttributes="Bold"
+                       TextColor="Black"/>
+
+                <!-- Зарплата -->
+                <Label Text="{Binding SalaryRange}"
+                       FontSize="18"
+                       TextColor="Green"
+                       FontAttributes="Bold"/>
+
+                <!-- Расположение и тип занятости -->
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <Label Grid.Column="0"
+                           Text="{Binding WorkLocation}"
+                           FontSize="14"
+                           TextColor="Gray"/>
+                    <Label Grid.Column="1"
+                           Text="{Binding EmploymentType}"
+                           FontSize="14"
+                           TextColor="Gray"/>
+                </Grid>
+
+                <!-- Требования -->
+                <Label Text="Требования:"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       TextColor="Black"
+                       Margin="0,15,0,0"/>
+
+                <Label Text="{Binding RequirementsText}"
+                       FontSize="14"
+                       TextColor="#333333"
+                       LineBreakMode="WordWrap"/>
+
+                <!-- Описание -->
+                <Label Text="Описание:"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       TextColor="Black"
+                       Margin="0,15,0,0"/>
+
+                <Label Text="{Binding VacancyDescription}"
+                       FontSize="14"
+                       TextColor="#333333"
+                       LineBreakMode="WordWrap"/>
+
+                <!-- Разделитель -->
+                <BoxView HeightRequest="1" Color="#e0e0e0" Margin="0,20,0,20"/>
+
+                <!-- Отклики на вакансию -->
+                <Label Text="Отклики на вакансию"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="Black"/>
+
+                <!-- Список откликов -->
+                <CollectionView ItemsSource="{Binding Responses}"
+                                SelectionMode="None"
+                                IsVisible="{Binding HasResponses}">
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <VerticalStackLayout Padding="0,5">
+                                <Border Padding="15"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 10"
+                                        Stroke="#e0e0e0">
+
+                                    <VerticalStackLayout Spacing="12">
+
+                                        <!-- Имя и статус -->
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                            <Label Grid.Column="0"
+                                                   Text="{Binding FullName}"
+                                                   FontSize="16"
+                                                   FontAttributes="Bold"
+                                                   TextColor="Black"
+                                                   VerticalOptions="Center"/>
+
+                                            <Frame Grid.Column="1"
+                                                   BorderColor="{Binding StatusColor}"
+                                                   BackgroundColor="Transparent"
+                                                   CornerRadius="8"
+                                                   Padding="10,5"
+                                                   HasShadow="False">
+                                                <Label Text="{Binding StatusText}"
+                                                       FontSize="12"
+                                                       FontAttributes="Bold"
+                                                       TextColor="{Binding StatusColor}"/>
+                                            </Frame>
+                                        </Grid>
+
+                                        <!-- Контактный номер -->
+                                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                            <Label Grid.Column="0"
+                                                   Text="☎"
+                                                   FontSize="14"
+                                                   TextColor="#666"
+                                                   VerticalOptions="Center"/>
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding PhoneNumber}"
+                                                   FontSize="14"
+                                                   TextColor="#666"/>
+                                        </Grid>
+
+                                        <!-- О себе -->
+                                        <VerticalStackLayout Spacing="5" IsVisible="{Binding About, Converter={StaticResource StringNotNullOrEmptyConverter}}">
+                                            <Label Text="О себе:"
+                                                   FontSize="12"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#999"/>
+                                            <Label Text="{Binding About}"
+                                                   FontSize="13"
+                                                   TextColor="#333"
+                                                   LineBreakMode="WordWrap"/>
+                                        </VerticalStackLayout>
+
+                                        <!-- Навыки -->
+                                        <VerticalStackLayout Spacing="5" IsVisible="{Binding SkillsText, Converter={StaticResource StringNotNullOrEmptyConverter}}">
+                                            <Label Text="Навыки:"
+                                                   FontSize="12"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#999"/>
+                                            <Label Text="{Binding SkillsText}"
+                                                   FontSize="13"
+                                                   TextColor="#333"
+                                                   LineBreakMode="WordWrap"/>
+                                        </VerticalStackLayout>
+
+                                        <!-- Кнопки принять/отклонить -->
+                                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
+                                            <Button Grid.Column="0"
+                                                    Text="✓ Принять"
+                                                    BackgroundColor="#4CAF50"
+                                                    TextColor="White"
+                                                    FontSize="14"
+                                                    Padding="15,8"
+                                                    CornerRadius="8"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AcceptResponseCommand}"
+                                                    CommandParameter="{Binding Id}"
+                                                    IsEnabled="{Binding Status, Converter={StaticResource StringToBoolConverter}, ConverterParameter='pending'}"/>
+
+                                            <Button Grid.Column="1"
+                                                    Text="✕ Отклонить"
+                                                    BackgroundColor="#F44336"
+                                                    TextColor="White"
+                                                    FontSize="14"
+                                                    Padding="15,8"
+                                                    CornerRadius="8"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RejectResponseCommand}"
+                                                    CommandParameter="{Binding Id}"
+                                                    IsEnabled="{Binding Status, Converter={StaticResource StringToBoolConverter}, ConverterParameter='pending'}"/>
+                                        </Grid>
+
+                                    </VerticalStackLayout>
+
+                                </Border>
+                            </VerticalStackLayout>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+
+                </CollectionView>
+
+                <!-- Сообщение если нет откликов -->
+                <Label Text="Нет откликов на эту вакансию"
+                       FontSize="14"
+                       TextColor="Gray"
+                       HorizontalTextAlignment="Center"
+                       IsVisible="{Binding HasResponses, Converter={StaticResource InvertedBoolConverter}}"/>
+
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

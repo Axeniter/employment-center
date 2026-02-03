@@ -87,9 +87,9 @@ namespace EmploymentApp.Viewmodels
 
         public string StatusText => Status switch
         {
-            "accepted" => "✓ Принята",
-            "rejected" => "✗ Отклонена",
-            "pending" => "⏳ На рассмотрении",
+            "accepted" => "Принята",
+            "rejected" => "Отклонена",
+            "pending" => "На рассмотрении",
             _ => Status
         };
     }
