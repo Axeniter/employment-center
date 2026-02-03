@@ -62,4 +62,9 @@
         ContentTemplate="{DataTemplate pages:VacancyDetailPage}"
         Route="vacancydetail" />
 
+    <ShellContent
+        Title="VacancyDetailEmployerPage"
+        ContentTemplate="{DataTemplate pages:VacancyDetailEmployerPage}"
+        Route="vacancydetailemployer" />
+
 </Shell>

@@ -524,5 +524,12 @@ namespace EmploymentApp.Viewmodels
             await Shell.Current.GoToAsync("//EventSearchPage");
         }
 
+        [RelayCommand]
+        public async Task SelectVacancy(int vacancyId)
+        {
+            Debug.WriteLine($"SelectVacancy called with vacancyId: {vacancyId}");
+            await Shell.Current.GoToAsync($"///vacancydetailemployer?id={vacancyId}");
+        }
+
     }
 }
