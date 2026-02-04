@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="EmploymentApp.Pages.EmployerPage"
+             xmlns:models="clr-namespace:EmploymentApp.Models"
+             Title="EmployerPage">
+
+    <ScrollView>
+        <VerticalStackLayout>
+            <Grid HeightRequest="40"
+                  BackgroundColor="#9dfca8">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Text="Вакансии"
+                        Grid.Column="0"
+                        BackgroundColor="Transparent"
+                        TextColor="Black"
+                        FontSize="16"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center">
+
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NavigateToVacanciesCommand}"/>
+                    </Label.GestureRecognizers>
+
+                </Label>
+
+                <Label Text="Coбытия"
+                       Grid.Column="1"
+                       BackgroundColor="Transparent"
+                       TextColor="Black"
+                       FontSize="16"
+                       VerticalOptions="Center"
+                       HorizontalOptions="Start">
+
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NavigateToEventsCommand}"/>
+                    </Label.GestureRecognizers>
+
+                </Label>
+
+                <Label Text="Чат"
+                       Grid.Column="3"
+                       BackgroundColor="Transparent"
+                       TextColor="Black"
+                       FontSize="16"
+                       VerticalOptions="Center"
+                       HorizontalOptions="End"/>
+
+                <Label Text="Профиль"
+                       Grid.Column="4"
+                       BackgroundColor="Transparent"
+                       TextColor="Black"
+                       FontSize="16"
+                       VerticalOptions="Center"
+                       HorizontalOptions="Center"
+                       FontAttributes="Bold"/>
+
+            </Grid>
+
+            <Grid RowDefinitions="*, Auto, Auto, Auto" 
+                  ColumnDefinitions="Auto, *"
+                  Padding="60,40,40,20" 
+                  RowSpacing="30"
+                  ColumnSpacing="40">
+
+                <Border Grid.Column="0"
+                        Grid.Row="0"
+                        StrokeShape="RoundRectangle 100"
+                        StrokeThickness="2"
+                        Stroke="#333333" 
+                        HeightRequest="204" 
+                        WidthRequest="204"
+                        HorizontalOptions="Start"
+                        VerticalOptions="Start"
+                        Margin="0,20,0,0">
+
+                    <Image Source="dotnet_bot.png"
+                           Aspect="AspectFill"
+                           HeightRequest="200"
+                           WidthRequest="200"/>
+
+                </Border>
+
+                <VerticalStackLayout Grid.Column="1"
+                         Grid.Row="0"
+                         VerticalOptions="Start"
+                         Spacing="10">
+
+                    <Label Text="Название компании:"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="Black"/>
+
+                    <Label Text="{Binding CompanyName}"
+                           FontSize="20"
+                           TextColor="#212121"/>
+
+                    <Label Text="Контактная информация:"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="Black"/>
+
+                    <Label Text="{Binding Contacts}"
+                           FontSize="20"
+                           TextColor="#212121"/>
+
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Spacing="10">
+                    <Label Text="Описание:"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="Black"/>
+
+                    <Label Text="{Binding Description}"
+                           FontSize="20"
+                           TextColor="#212121"/>
+
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Spacing="10">
+
+                    <!-- Переключатель события/вакансии -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <Border BackgroundColor="{Binding EventColor}"
+                                Stroke="Transparent" 
+                                StrokeThickness="0"
+                                HeightRequest="50" 
+                                HorizontalOptions="Fill" 
+                                Padding="0">
+
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10"/>
+                            </Border.StrokeShape>
+
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding EventTappedCommand}"/>
+                            </Border.GestureRecognizers>
+
+                            <Label Text="События" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
+                        </Border>
+
+                        <Border Grid.Column="1" 
+                                BackgroundColor="{Binding VacancyColor}"
+                                Stroke="Transparent" 
+                                StrokeThickness="0"
+                                HeightRequest="50" 
+                                HorizontalOptions="Fill" 
+                                Padding="0">
+
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10"/>
+                            </Border.StrokeShape>
+
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding VacancyTappedCommand}"/>
+                            </Border.GestureRecognizers>
+
+                            <Label Text="Вакансии" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
+                        </Border>
+                    </Grid>
+
+                    <Button Text="{Binding IsVacancySelected, StringFormat='Создать вакансию'}"
+                            BackgroundColor="#9dfca8"
+                            TextColor="Black"
+                            FontSize="16"
+                            Padding="15,10"
+                            CornerRadius="8"
+                            Margin="0,10,0,0"
+                            Command="{Binding NavigateToCreateVacancyPageCommand}"
+                            IsVisible="{Binding IsVacancySelected}"/>
+
+                    <Button Text="{Binding IsVacancySelected, Converter={StaticResource InvertedBoolConverter}, StringFormat='Создать событие'}"
+                            BackgroundColor="#9dfca8"
+                            TextColor="Black"
+                            FontSize="16"
+                            Padding="15,10"
+                            CornerRadius="8"
+                            Margin="0,10,0,0"
+                            Command="{Binding NavigateToCreateEventPageCommand}"
+                            IsVisible="{Binding IsVacancySelected, Converter={StaticResource InvertedBoolConverter}}"/>
+
+                    <CollectionView ItemsSource="{Binding DisplayedEvents}"
+                                    IsVisible="{Binding IsVacancySelected, Converter={StaticResource InvertedBoolConverter}}"
+                                    SelectionMode="None"
+                                    Margin="10,0">
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <VerticalStackLayout Padding="0,5">
+                                    <Border Padding="10" StrokeThickness="1" StrokeShape="RoundRectangle 10" Stroke="#e0e0e0">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+
+                                            <!-- Основные данные -->
+                                            <VerticalStackLayout Grid.Column="0" Spacing="5">
+                                                <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold"/>
+                                                <Label Text="{Binding FormattedDate}" FontSize="14" TextColor="Gray"/>
+                                                <Label Text="{Binding EventLocation}" FontSize="14" TextColor="Gray"/>
+                                                <Label Text="{Binding Description}" FontSize="14" LineBreakMode="TailTruncation" MaxLines="2"/>
+                                            </VerticalStackLayout>
+
+                                            <!-- Кнопка удаления события -->
+                                            <Button Grid.Column="1"
+                                                    Text="✕" 
+                                                    BackgroundColor="#ff6b6b" 
+                                                    TextColor="White"
+                                                    FontSize="16"
+                                                    HeightRequest="40"
+                                                    WidthRequest="40"
+                                                    CornerRadius="20"
+                                                    Padding="0"
+                                                    VerticalOptions="Start"
+                                                    HorizontalOptions="End"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EventDeleteCommand}"
+                                                    CommandParameter="{Binding Id}"/>
+                                        </Grid>
+                                    </Border>
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+
+                    <VerticalStackLayout IsVisible="{Binding IsVacancySelected, Converter={StaticResource InvertedBoolConverter}}" 
+                                         Padding="20" 
+                                         Spacing="10"
+                                         VerticalOptions="Center"
+                                         HorizontalOptions="Center">
+
+                        <VerticalStackLayout IsVisible="{Binding HasNoEvents}" Spacing="10">
+                            <Label Text="Нет событий" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#999"/>
+                            <Label Text="Вы пока не создали ни одного события" FontSize="12" HorizontalOptions="Center" TextColor="#ccc"/>
+                        </VerticalStackLayout>
+
+                    </VerticalStackLayout>
+
+                    <CollectionView ItemsSource="{Binding DisplayedVacancies}"
+                                    IsVisible="{Binding IsVacancySelected}"
+                                    SelectionMode="None"
+                                    Margin="10,0">
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <VerticalStackLayout Padding="0,5">
+                                    <Border Padding="10" StrokeThickness="1" StrokeShape="RoundRectangle 10" Stroke="#e0e0e0">
+
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectVacancyCommand}"
+                                                                  CommandParameter="{Binding Id}"/>
+                                        </Border.GestureRecognizers>
+
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+
+                                            <!-- основные данные -->
+                                            <VerticalStackLayout Grid.Column="0" Spacing="8">
+                                                <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold"/>
+                                                <Label Text="{Binding SalaryRange}" FontSize="14" TextColor="Green" FontAttributes="Bold"/>
+                                                <Label Text="{Binding WorkLocation}" FontSize="14" TextColor="Gray"/>
+
+                                                <!-- Теги -->
+                                                <CollectionView ItemsSource="{Binding Tags}" SelectionMode="None" HeightRequest="35">
+
+                                                    <CollectionView.ItemsLayout>
+                                                        <LinearItemsLayout Orientation="Horizontal" ItemSpacing="5"/>
+                                                    </CollectionView.ItemsLayout>
+
+                                                    <CollectionView.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Border Padding="5,2" StrokeThickness="0" StrokeShape="RoundRectangle 10" BackgroundColor="#f0f0f0">
+                                                                <Label Text="{Binding .}" FontSize="11"/>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </CollectionView.ItemTemplate>
+
+                                                </CollectionView>
+                                            </VerticalStackLayout>
+
+                                            <!-- Кнопка удаления -->
+                                            <Button Grid.Column="1"
+                                                    Text="✕" 
+                                                    BackgroundColor="#ff6b6b" 
+                                                    TextColor="White"
+                                                    FontSize="16"
+                                                    HeightRequest="40"
+                                                    WidthRequest="40"
+                                                    CornerRadius="20"
+                                                    Padding="0"
+                                                    VerticalOptions="Start"
+                                                    HorizontalOptions="End"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.VacancyDeleteCommand}"
+                                                    CommandParameter="{Binding Id}"/>
+                                        </Grid>
+                                    </Border>
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <VerticalStackLayout IsVisible="{Binding IsVacancySelected}" 
+                                         Padding="20" 
+                                         Spacing="10"
+                                         VerticalOptions="Center"
+                                         HorizontalOptions="Center">
+
+                        <VerticalStackLayout IsVisible="{Binding HasNoVacancies}" Spacing="10">
+                            <Label Text="Нет вакансий" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#999"/>
+                            <Label Text="Вы пока не создали ни одной вакансии" FontSize="12" HorizontalOptions="Center" TextColor="#ccc"/>
+                        </VerticalStackLayout>
+
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+
+            </Grid>
+
+        </VerticalStackLayout>
+
+    </ScrollView>
+
+</ContentPage>

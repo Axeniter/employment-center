@@ -1,4 +1,5 @@
-﻿namespace EmploymentApp
+﻿
+namespace EmploymentApp
 {
     public partial class AppShell : Shell
     {

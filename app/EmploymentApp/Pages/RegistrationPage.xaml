@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:EmploymentApp.Viewmodels"
+             x:Class="EmploymentApp.Pages.RegistrationPage"
+             Title="RegistrationPage">
+
+    <Grid BackgroundColor="#F5F5F7">
+        
+        <Border Stroke="Transparent"
+                BackgroundColor="#f0f0f0"
+                StrokeThickness="0"
+                Margin="20"
+                Padding="30"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"
+                WidthRequest="400">
+
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="20"/>
+            </Border.StrokeShape>
+            
+            <Border.Shadow>
+                <Shadow Brush="Black" Offset="0,2" Opacity="0.2" Radius="10"/>
+            </Border.Shadow>
+
+            <VerticalStackLayout Spacing="25">
+
+                <Label Text="Регистрация" FontSize="28" HorizontalOptions="Center" TextColor="Black"/>
+
+                <!-- Переключатель -->
+                <Grid ColumnDefinitions="*,*" 
+                      ColumnSpacing="10">
+                    
+                    <Border BackgroundColor="{Binding ApplicantColor}"
+                            Stroke="Transparent" 
+                            StrokeThickness="0"
+                            HeightRequest="50" 
+                            HorizontalOptions="Fill" 
+                            Padding="0">
+                        
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ApplicantTappedCommand}"/>
+                        </Border.GestureRecognizers>
+                        
+                        <Label Text="соискатель" 
+                               FontSize="16" 
+                               HorizontalOptions="Center" 
+                               VerticalOptions="Center" 
+                               TextColor="Black"/>
+                    </Border>
+
+                    <Border Grid.Column="1" 
+                            BackgroundColor="{Binding EmployerColor}"
+                            Stroke="Transparent" 
+                            StrokeThickness="0"
+                            HeightRequest="50" 
+                            HorizontalOptions="Fill" 
+                            Padding="0">
+                        
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding EmployerTappedCommand}"/>
+                        </Border.GestureRecognizers>
+                        
+                        <Label Text="работодатель" FontSize="16" 
+                               HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
+                    </Border>
+                </Grid>
+
+                <!-- Email -->
+                <VerticalStackLayout Spacing="5">
+                    
+                    <Label Text="Почта" 
+                           FontSize="14" 
+                           TextColor="Black"/>
+                    
+                    <Border Stroke="#E0E0E0" 
+                            StrokeThickness="1" 
+                            BackgroundColor="#F8F8F8" 
+                            HeightRequest="50" 
+                            HorizontalOptions="Fill">
+                        
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        
+                        <Entry Text="{Binding Email}" 
+                               Placeholder="Введите почту..." 
+                               PlaceholderColor="#999999" 
+                               BackgroundColor="#F8F8F8" 
+                               HeightRequest="50" 
+                               ClearButtonVisibility="WhileEditing" 
+                               TextColor="Black"/>
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Password -->
+                <VerticalStackLayout Spacing="5">
+                    
+                    <Label Text="Пароль" FontSize="14" TextColor="Black"/>
+                    
+                    <Border Stroke="#E0E0E0" 
+                            StrokeThickness="1" 
+                            BackgroundColor="#F8F8F8" 
+                            HeightRequest="50" 
+                            HorizontalOptions="Fill">
+                        
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        
+                        <Entry Text="{Binding Password}" 
+                               Placeholder="Введите пароль..." 
+                               PlaceholderColor="#999999" 
+                               BackgroundColor="#F8F8F8" 
+                               HeightRequest="50" 
+                               IsPassword="True" 
+                               ClearButtonVisibility="WhileEditing" 
+                               TextColor="Black"/>
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Confirm Password -->
+                <VerticalStackLayout Spacing="5">
+                    
+                    <Label Text="Повторите пароль" 
+                           FontSize="14" 
+                           TextColor="Black"/>
+                    
+                    <Border Stroke="#E0E0E0" 
+                            StrokeThickness="1" 
+                            BackgroundColor="#F8F8F8" 
+                            HeightRequest="50" 
+                            HorizontalOptions="Fill">
+                        
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        
+                        <Entry Text="{Binding ConfirmPassword}" 
+                               Placeholder="Повторите пароль..." 
+                               PlaceholderColor="#999999" 
+                               BackgroundColor="#F8F8F8" 
+                               HeightRequest="50" 
+                               IsPassword="True" 
+                               ClearButtonVisibility="WhileEditing" 
+                               TextColor="Black"/>
+                        
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Ссылка на логин -->
+                <Label Text="Есть аккаунт? Войти" 
+                       FontSize="14" TextColor="Black" 
+                       HorizontalOptions="Start">
+                    
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NavigateToLoginCommand}"/>
+                    </Label.GestureRecognizers>
+                    
+                </Label>
+
+                <!-- Кнопка регистрации -->
+                <Button Text="ЗАРЕГИСТРИРОВАТЬСЯ" 
+                        Command="{Binding RegisterTappedCommand}"
+                        BackgroundColor="#9dfca8" 
+                        TextColor="Black" 
+                        FontSize="18"
+                        FontAttributes="Bold" 
+                        CornerRadius="10" 
+                        HeightRequest="55" 
+                        Margin="0,10,0,0"/>
+
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentPage>

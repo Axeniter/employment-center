@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="EmploymentApp.Pages.EventSearchPage"
+             Title="EventSearchPage">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Навигационный хедер -->
+        <Grid Grid.Row="0" 
+              HeightRequest="40"
+              BackgroundColor="#9dfca8">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Text="Вакансии"
+                   Grid.Column="0"
+                   BackgroundColor="Transparent"
+                   TextColor="Black"
+                   FontSize="16"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center">
+
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateToVacanciesCommand}"/>
+                </Label.GestureRecognizers>
+
+            </Label>
+
+            <Label Text="События"
+                   Grid.Column="1"
+                   BackgroundColor="Transparent"
+                   TextColor="Black"
+                   FontSize="16"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Start"
+                   FontAttributes="Bold"/>
+
+            <Label Text="Чат"
+                   Grid.Column="3"
+                   BackgroundColor="Transparent"
+                   TextColor="Black"
+                   FontSize="16"
+                   VerticalOptions="Center"
+                   HorizontalOptions="End">
+
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateToChatCommand}"/>
+                </Label.GestureRecognizers>
+
+            </Label>
+
+            <Label Text="Профиль"
+                   Grid.Column="4"
+                   BackgroundColor="Transparent"
+                   TextColor="Black"
+                   FontSize="16"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center">
+
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateToProfileCommand}"/>
+                </Label.GestureRecognizers>
+
+            </Label>
+
+        </Grid>
+
+        <!-- Основное содержимое -->
+        <Grid Grid.Row="1" ColumnDefinitions="250,*" RowDefinitions="*">
+
+            <!-- панель фильтров -->
+            <ScrollView Grid.Column="0" 
+                        Grid.Row="0"
+                        BackgroundColor="#e8e8e8">
+
+                <VerticalStackLayout Padding="15" Spacing="15">
+                    <Label Text="Фильтры" 
+                           FontSize="16" 
+                           FontAttributes="Bold"
+                           TextColor="Black"/>
+
+                    <!-- Поиск -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Поиск" FontSize="12" FontAttributes="Bold" TextColor="Black"/>
+                        <Entry Placeholder="Название события..."
+                               Text="{Binding SearchText}"
+                               BackgroundColor="White"
+                               TextColor="Black"
+                               PlaceholderColor="#999999"/>
+                    </VerticalStackLayout>
+
+                    <!-- Локация -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Локация" FontSize="12" FontAttributes="Bold" TextColor="Black"/>
+                        <Entry Placeholder="Город..."
+                               Text="{Binding FilterLocation}"
+                               BackgroundColor="White"
+                               TextColor="Black"
+                               PlaceholderColor="#999999"/>
+                    </VerticalStackLayout>
+
+                    <!-- Удалённо -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Удаленное событие" FontSize="12" FontAttributes="Bold" TextColor="Black"/>
+                        <Switch IsToggled="{Binding FilterIsRemote}" />
+                    </VerticalStackLayout>
+
+                    <!-- Дата начала -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Дата от" FontSize="12" FontAttributes="Bold" TextColor="Black"/>
+                        <Entry Placeholder="ГГГГ-ММ-ДД"
+                               Text="{Binding DateFromString}"
+                               BackgroundColor="White"
+                               TextColor="Black"
+                               PlaceholderColor="#999999"/>
+                    </VerticalStackLayout>
+
+                    <!-- Дата конца -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Дата до" FontSize="12" FontAttributes="Bold" TextColor="Black"/>
+                        <Entry Placeholder="ГГГГ-ММ-ДД"
+                               Text="{Binding DateToString}"
+                               BackgroundColor="White"
+                               TextColor="Black"
+                               PlaceholderColor="#999999"/>
+                    </VerticalStackLayout>
+
+                    <!-- Кнопки -->
+                    <VerticalStackLayout Spacing="10" Margin="0,10,0,0">
+                        <Button Text="ПРИМЕНИТЬ"
+                                Command="{Binding ApplyFiltersCommand}"
+                                BackgroundColor="#9dfca8"
+                                TextColor="Black"
+                                FontAttributes="Bold"
+                                CornerRadius="8"
+                                Padding="10,8"/>
+
+                        <Button Text="СБРОСИТЬ"
+                                Command="{Binding ResetFiltersCommand}"
+                                BackgroundColor="#e0e0e0"
+                                TextColor="Black"
+                                FontAttributes="Bold"
+                                CornerRadius="8"
+                                Padding="10,8"/>
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <!-- Правая панель со списком событий -->
+            <RefreshView Grid.Column="1" 
+                         Grid.Row="0"
+                         Command="{Binding LoadEventsCommand}"
+                         IsRefreshing="{Binding IsLoading}">
+
+                <ScrollView>
+                    <VerticalStackLayout Padding="15" Spacing="5">
+
+                        <!-- Сообщение об ошибке -->
+                        <Label Text="{Binding ErrorMessage}"
+                               IsVisible="{Binding HasError}"
+                               TextColor="Red"
+                               FontSize="14"
+                               Padding="10"/>
+
+                        <!-- Список событий -->
+                        <CollectionView ItemsSource="{Binding Events}"
+                                        SelectionMode="None"
+                                        SelectionChangedCommand="{Binding .}">
+
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <VerticalStackLayout Padding="0,5">
+                                        <Border Padding="10" 
+                                                StrokeThickness="1" 
+                                                StrokeShape="RoundRectangle 10" 
+                                                Stroke="#e0e0e0">
+
+                                            <Grid ColumnDefinitions="*" ColumnSpacing="10">
+
+                                                <!-- Основные данные -->
+                                                <VerticalStackLayout Grid.Column="0" Spacing="8">
+                                                    <Label Text="{Binding Title}" 
+                                                           FontSize="16" 
+                                                           FontAttributes="Bold"
+                                                           TextColor="Black"/>
+
+                                                    <Label Text="{Binding Description}" 
+                                                           FontSize="13"
+                                                           TextColor="Black"
+                                                           LineBreakMode="WordWrap"/>
+
+                                                    <Label Text="{Binding FormattedDateTime}" 
+                                                           FontSize="14" 
+                                                           TextColor="Green" 
+                                                           FontAttributes="Bold"/>
+
+                                                    <Label Text="{Binding WorkLocation}" 
+                                                           FontSize="13" 
+                                                           TextColor="Gray"/>
+                                                </VerticalStackLayout>
+
+                                            </Grid>
+                                        </Border>
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+
+                        </CollectionView>
+
+                    </VerticalStackLayout>
+                </ScrollView>
+            </RefreshView>
+
+        </Grid>
+
+    </Grid>
+
+</ContentPage>
