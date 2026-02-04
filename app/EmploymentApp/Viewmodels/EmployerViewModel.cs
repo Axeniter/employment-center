@@ -1,0 +1,535 @@
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using EmploymentApp.Models;
+using EmploymentApp.Services;
+using System;
+using System.Buffers.Text;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+
+namespace EmploymentApp.Viewmodels
+{
+    public class EmployerProfileResponse
+    {
+        [JsonPropertyName("company_name")]
+        public string CompanyName { get; set; }
+
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [JsonPropertyName("contact")]
+        public string Contact { get; set; }
+    }
+
+    public class VacancyResponse
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("title")]
+        public string Title { get; set; }
+
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [JsonPropertyName("tags")]
+        public List<string> Tags { get; set; } = new();
+
+        [JsonPropertyName("salary_from")]
+        public int SalaryFrom { get; set; }
+
+        [JsonPropertyName("salary_to")]
+        public int SalaryTo { get; set; }
+
+        [JsonPropertyName("salary_currency")]
+        public string SalaryCurrency { get; set; }
+
+        [JsonPropertyName("location")]
+        public string Location { get; set; }
+
+        [JsonPropertyName("is_remote")]
+        public bool IsRemote { get; set; }
+
+        [JsonPropertyName("employer_id")]
+        public string EmployerId { get; set; }
+
+        [JsonPropertyName("is_active")]
+        public bool IsActive { get; set; }
+
+        public VacancyItemViewModel ToViewModel()
+        {
+            return new VacancyItemViewModel
+            {
+                Id = Id,
+                Title = Title,
+                Description = Description,
+                Tags = Tags ?? new(),
+                SalaryFrom = SalaryFrom,
+                SalaryTo = SalaryTo,
+                SalaryCurrency = SalaryCurrency,
+                Location = Location,
+                IsRemote = IsRemote
+            };
+        }
+    }
+
+    public class EventResponse
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("title")]
+        public string Title { get; set; }
+
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [JsonPropertyName("location")]
+        public string Location { get; set; }
+
+        [JsonPropertyName("is_remote")]
+        public bool IsRemote { get; set; }
+
+        [JsonPropertyName("date")]
+        public DateTime Date { get; set; }
+
+        [JsonPropertyName("employer_id")]
+        public string EmployerId { get; set; }
+
+        [JsonPropertyName("is_active")]
+        public bool IsActive { get; set; }
+
+        public EventItemViewModel ToViewModel()
+        {
+            return new EventItemViewModel
+            {
+                Id = Id,
+                Title = Title,
+                Description = Description,
+                Location = Location,
+                IsRemote = IsRemote,
+                Date = Date,
+                EmployerId = EmployerId,
+                IsActive = IsActive
+            };
+        }
+
+    }
+
+    public partial class EmployerViewModel : ObservableObject
+    {
+        private readonly ApiClient _apiClient;
+        private readonly AuthService _authService;
+
+        [ObservableProperty]
+        private bool hasNoEvents;
+
+        [ObservableProperty]
+        private bool hasNoVacancies;
+
+
+        [ObservableProperty]
+        private string companyName;
+
+        [ObservableProperty]
+        private string description;
+
+        [ObservableProperty]
+        private string contacts;
+
+        [ObservableProperty]
+        private bool isVacancySelected;
+
+        [ObservableProperty]
+        private ObservableCollection<Event> eventCollection;
+
+        [ObservableProperty]
+        private ObservableCollection<Vacancy> vacancyCollection;
+
+        [ObservableProperty]
+        private ObservableCollection<Event> displayedEvents;
+
+        [ObservableProperty]
+        private ObservableCollection<Vacancy> displayedVacancies;
+
+
+
+        [ObservableProperty]
+        private Color eventColor = Color.FromArgb("#9dfca8");
+
+        [ObservableProperty]
+        private Color vacancyColor = Color.FromArgb("#e0e0e0");
+
+        public EmployerViewModel(ApiClient apiClient, AuthService authService)
+        {
+            _apiClient = apiClient;
+            _authService = authService;
+
+            UpdateColors();
+
+            LoadData();
+
+            // Инициализация коллекции событий
+            EventCollection = new ObservableCollection<Event>();
+
+            // Инициализация коллекции вакансий
+            VacancyCollection = new ObservableCollection<Vacancy>();
+
+            // Инициализация отображаемых коллекций
+            DisplayedEvents = new ObservableCollection<Event>(EventCollection);
+            DisplayedVacancies = new ObservableCollection<Vacancy>();
+        }
+
+        [RelayCommand]
+        public async Task LoadData()
+        {
+            await LoadProfile();
+            await LoadVacancies();
+            await LoadEvents();
+            IsVacancySelected = false;
+            UpdateEmptyStates();
+        }
+
+        private async Task LoadProfile()
+        {
+            try
+            {
+                var token = await _authService.GetAccessTokenAsync();
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    await Application.Current.MainPage.DisplayAlert(
+                        "Ошибка",
+                        "Токен не найден",
+                        "OK"
+                    );
+
+                    return;
+                }
+
+                var profileData = await _apiClient.GetAsJsonAsync<EmployerProfileResponse>(
+                    "/profile/me",
+                    token
+                );
+
+                if (profileData != null)
+                {
+                    CompanyName = profileData.CompanyName ?? "";
+                    Contacts = profileData.Contact ?? "";
+                    Description = profileData.Description ?? "";
+
+                    Debug.WriteLine("Profile loaded successfully");
+                }
+                else
+                {
+                    await Application.Current.MainPage.DisplayAlert(
+                        "Ошибка",
+                        "Не удалось загрузить профиль",
+                        "OK"
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Load profile error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert(
+                    "Ошибка",
+                    $"Ошибка загрузки профиля: {ex.Message}",
+                    "OK"
+                );
+            }
+        }
+
+        private async Task LoadVacancies()
+        {
+            try
+            {
+                var token = await _authService.GetAccessTokenAsync();
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    await Application.Current.MainPage.DisplayAlert(
+                        "Ошибка",
+                        "Токен не найден",
+                        "OK"
+                    );
+                    return;
+                }
+
+                var vacanciesResponse = await _apiClient.GetAsJsonAsync<List<VacancyResponse>>("/vacancies/me", token);
+
+                if (vacanciesResponse != null && vacanciesResponse.Count > 0)
+                {
+                    DisplayedVacancies.Clear();
+
+                    foreach (var vacancy in vacanciesResponse)
+                    {
+                        VacancyCollection.Add(new Vacancy(
+                            vacancy.Id,
+                            vacancy.Title,
+                            vacancy.Description,
+                            vacancy.SalaryFrom,
+                            vacancy.SalaryTo,
+                            vacancy.Location,
+                            vacancy.IsRemote,
+                            vacancy.EmployerId,
+                            vacancy.Tags,
+                            vacancy.SalaryCurrency,
+                            vacancy.IsActive
+                        ));
+                    }
+
+                    Debug.WriteLine($"Vacancies loaded successfully: {DisplayedVacancies.Count}");
+                }
+                else
+                {
+                    await Application.Current.MainPage.DisplayAlert(
+                        "Ошибка",
+                        "Не удалось загрузить вакансии",
+                        "OK"
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Load vacancies error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert(
+                    "Ошибка",
+                    $"Ошибка загрузки вакансий: {ex.Message}",
+                    "OK"
+                );
+            }
+        }
+
+        private async Task LoadEvents()
+        {
+            try
+            {
+                var token = await _authService.GetAccessTokenAsync();
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    await Application.Current.MainPage.DisplayAlert(
+                        "Ошибка",
+                        "Токен не найден",
+                        "OK"
+                    );
+                    return;
+                }
+
+                var eventsResponse = await _apiClient.GetAsJsonAsync<List<EventResponse>>("/events/me", token);
+
+                if (eventsResponse != null && eventsResponse.Count > 0)
+                {
+                    DisplayedEvents.Clear();
+
+                    foreach (var eventItem in eventsResponse)
+                    {
+                        EventCollection.Add(new Event(
+                            eventItem.Id,
+                            eventItem.Title,
+                            eventItem.Description,
+                            eventItem.Location,
+                            eventItem.IsRemote,
+                            eventItem.Date,
+                            eventItem.EmployerId,
+                            true
+                        ));
+                    }
+
+                    Debug.WriteLine($"Events loaded successfully: {DisplayedEvents.Count}");
+                }
+                else
+                {
+                    await Application.Current.MainPage.DisplayAlert(
+                        "Ошибка",
+                        "Не удалось загрузить события",
+                        "OK"
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Load events error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert(
+                    "Ошибка",
+                    $"Ошибка загрузки событий: {ex.Message}",
+                    "OK"
+                );
+            }
+        }
+
+        partial void OnIsVacancySelectedChanged(bool value)
+        {
+            UpdateColors();
+            UpdateDisplayedCollections();
+        }
+
+        private void UpdateColors()
+        {
+            EventColor = IsVacancySelected ? Color.FromArgb("#e0e0e0") : Color.FromArgb("#9dfca8");
+            VacancyColor = IsVacancySelected ? Color.FromArgb("#9dfca8") : Color.FromArgb("#e0e0e0");
+        }
+
+        private void UpdateDisplayedCollections()
+        {
+            if (IsVacancySelected)
+            {
+                DisplayedEvents.Clear();
+                DisplayedVacancies = new ObservableCollection<Vacancy>(VacancyCollection);
+            }
+            else
+            {
+                DisplayedVacancies.Clear();
+                DisplayedEvents = new ObservableCollection<Event>(EventCollection);
+            }
+        }
+
+        private void UpdateEmptyStates()
+        {
+            HasNoEvents = DisplayedEvents?.Count == 0;
+            HasNoVacancies = DisplayedVacancies?.Count == 0;
+        }
+
+        partial void OnDisplayedEventsChanged(ObservableCollection<Event> value)
+        {
+            UpdateEmptyStates();
+        }
+
+        partial void OnDisplayedVacanciesChanged(ObservableCollection<Vacancy> value)
+        {
+            UpdateEmptyStates();
+        }
+
+        [RelayCommand]
+        private void EventTapped()
+        {
+            IsVacancySelected = false;
+        }
+
+        [RelayCommand]
+        private void VacancyTapped()
+        {
+            IsVacancySelected = true;
+        }
+
+        [RelayCommand]
+        private async void VacancyDelete(int id)
+        {
+            try
+            {
+                var token = await _authService.GetAccessTokenAsync();
+                if (string.IsNullOrEmpty(token))
+                {
+                    await Application.Current.MainPage.DisplayAlert("Ошибка", "Не авторизован", "OK");
+                    return;
+                }
+
+                var response = await _apiClient.DeleteAsync($"/vacancies/{id}", token);
+
+                if (response.IsSuccessStatusCode)
+                {
+
+                    var vacancyToRemove = DisplayedVacancies.FirstOrDefault(v => v.Id == id);
+                    if (vacancyToRemove != null)
+                    {
+                        DisplayedVacancies.Remove(vacancyToRemove);
+                        UpdateEmptyStates();
+                    }
+
+                    await Application.Current.MainPage.DisplayAlert("Успех", "Вакансия удалена", "OK");
+                    Debug.WriteLine($"Vacancy {id} deleted successfully");
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    await Application.Current.MainPage.DisplayAlert("Ошибка", $"Не удалось удалить: {response.StatusCode}", "OK");
+                    Debug.WriteLine($"Delete failed: {response.StatusCode} - {errorContent}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Delete vacancy error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert("Ошибка", $"Ошибка удаления: {ex.Message}", "OK");
+            }
+        }
+
+        [RelayCommand]
+        private async Task EventDelete(int id)
+        {
+            try
+            {
+                var token = await _authService.GetAccessTokenAsync();
+                if (string.IsNullOrEmpty(token))
+                {
+                    await Application.Current.MainPage.DisplayAlert("Ошибка", "Не авторизован", "OK");
+                    return;
+                }
+
+                var response = await _apiClient.DeleteAsync($"/events/{id}", token);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Удаляем из локальной коллекции
+                    var eventToRemove = DisplayedEvents.FirstOrDefault(e => e.Id == id);
+                    if (eventToRemove != null)
+                    {
+                        DisplayedEvents.Remove(eventToRemove);
+                        UpdateEmptyStates();
+                    }
+
+                    await Application.Current.MainPage.DisplayAlert("Успех", "Событие удалено", "OK");
+                    Debug.WriteLine($"Event {id} deleted successfully");
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    await Application.Current.MainPage.DisplayAlert("Ошибка", $"Не удалось удалить: {response.StatusCode}", "OK");
+                    Debug.WriteLine($"Delete failed: {response.StatusCode} - {errorContent}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Delete event error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert("Ошибка", $"Ошибка удаления: {ex.Message}", "OK");
+            }
+        }
+
+        [RelayCommand]
+        private async Task NavigateToCreateVacancyPage()
+        {
+            await Shell.Current.GoToAsync("//VacancyCreatePage");
+        }
+
+        [RelayCommand]
+        private async Task NavigateToCreateEventPage()
+        {
+            await Shell.Current.GoToAsync("//EventCreatePage");
+        }
+
+        [RelayCommand]
+        public async Task NavigateToVacancies()
+        {
+            await Shell.Current.GoToAsync("//VacancySearchPage");
+        }
+
+        [RelayCommand]
+        public async Task NavigateToEvents()
+        {
+            await Shell.Current.GoToAsync("//EventSearchPage");
+        }
+
+        [RelayCommand]
+        public async Task SelectVacancy(int vacancyId)
+        {
+            Debug.WriteLine($"SelectVacancy called with vacancyId: {vacancyId}");
+            await Shell.Current.GoToAsync($"///vacancydetailemployer?id={vacancyId}");
+        }
+
+    }
+}

@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="EmploymentApp.Pages.VacancySearchPage"
+             xmlns:local="clr-namespace:EmploymentApp.Viewmodels"
+             Title="VacancySearchPage">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Навигационный хедер -->
+        <Grid Grid.Row="0" 
+              HeightRequest="40"
+              BackgroundColor="#9dfca8">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Text="Вакансии"
+                   Grid.Column="0"
+                   BackgroundColor="Transparent"
+                   TextColor="Black"
+                   FontSize="16"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center"
+                   FontAttributes="Bold"/>
+
+            <Label Text="События"
+                   Grid.Column="1"
+                   BackgroundColor="Transparent"
+                   TextColor="Black"
+                   FontSize="16"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Start">
+
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateToEventsCommand}"/>
+                </Label.GestureRecognizers>
+
+            </Label>
+
+            <Label Text="Чат"
+                   Grid.Column="3"
+                   BackgroundColor="Transparent"
+                   TextColor="Black"
+                   FontSize="16"
+                   VerticalOptions="Center"
+                   HorizontalOptions="End"/>
+
+            <Label Text="Профиль"
+                   Grid.Column="4"
+                   BackgroundColor="Transparent"
+                   TextColor="Black"
+                   FontSize="16"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center">
+
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateToProfileCommand}"/>
+                </Label.GestureRecognizers>
+
+            </Label>
+
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="250,*" RowDefinitions="*">
+
+            <!-- панель фильтров -->
+            <ScrollView Grid.Column="0" 
+                        Grid.Row="0"
+                        BackgroundColor="#e8e8e8">
+
+                <VerticalStackLayout Padding="15" Spacing="15">
+                    <Label Text="Фильтры" 
+                           FontSize="16" 
+                           FontAttributes="Bold"
+                           TextColor="Black"/>
+
+                    <!-- Поиск -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Поиск" FontSize="12" FontAttributes="Bold" TextColor="Black"/>
+                        <Entry Placeholder="Название вакансии..."
+                               Text="{Binding SearchText}"
+                               BackgroundColor="White"
+                               TextColor="Black"
+                               PlaceholderColor="#999999"/>
+                    </VerticalStackLayout>
+
+                    <!-- Локация -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Локация" FontSize="12" FontAttributes="Bold" TextColor="Black"/>
+                        <Entry Placeholder="Город..."
+                               Text="{Binding FilterLocation}"
+                               BackgroundColor="White"
+                               TextColor="Black"
+                               PlaceholderColor="#999999"/>
+                    </VerticalStackLayout>
+
+                    <!-- Удалённо -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Удаленная работа" FontSize="12" FontAttributes="Bold" TextColor="Black"/>
+                        <Switch IsToggled="{Binding FilterIsRemote}" />
+                    </VerticalStackLayout>
+
+                    <!-- Минимальная зарплата -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Зарплата от" FontSize="12" FontAttributes="Bold" TextColor="Black"/>
+                        <Entry Placeholder="0"
+                               Text="{Binding MinSalaryText}"
+                               Keyboard="Numeric"
+                               BackgroundColor="White"
+                               TextColor="Black"
+                               PlaceholderColor="#999999"/>
+                    </VerticalStackLayout>
+
+                    <!-- Максимальная зарплата -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Зарплата до" FontSize="12" FontAttributes="Bold" TextColor="Black"/>
+                        <Entry Placeholder="100000"
+                               Text="{Binding MaxSalaryText}"
+                               Keyboard="Numeric"
+                               BackgroundColor="White"
+                               TextColor="Black"
+                               PlaceholderColor="#999999"/>
+                    </VerticalStackLayout>
+
+                    <!-- Валюта -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Валюта" FontSize="12" FontAttributes="Bold" TextColor="Black"/>
+                        <Picker SelectedItem="{Binding SalaryCurrency}"
+                                BackgroundColor="White"
+                                TextColor="Black">
+                            <Picker.ItemsSource>
+                                <x:Array Type="{x:Type x:String}">
+                                    <x:String>RUB</x:String>
+                                    <x:String>USD</x:String>
+                                    <x:String>EUR</x:String>
+                                </x:Array>
+                            </Picker.ItemsSource>
+                        </Picker>
+                    </VerticalStackLayout>
+
+                    <!-- Кнопки -->
+                    <VerticalStackLayout Spacing="10" Margin="0,10,0,0">
+                        <Button Text="ПРИМЕНИТЬ"
+                                Command="{Binding ApplyFiltersCommand}"
+                                BackgroundColor="#9dfca8"
+                                TextColor="Black"
+                                FontAttributes="Bold"
+                                CornerRadius="8"
+                                Padding="10,8"/>
+
+                        <Button Text="СБРОСИТЬ"
+                                Command="{Binding ResetFiltersCommand}"
+                                BackgroundColor="#e0e0e0"
+                                TextColor="Black"
+                                FontAttributes="Bold"
+                                CornerRadius="8"
+                                Padding="10,8"/>
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <RefreshView Grid.Column="1" 
+                         Grid.Row="0"
+                         Command="{Binding LoadVacanciesCommand}"
+                         IsRefreshing="{Binding IsLoading}">
+
+                <ScrollView>
+                    <VerticalStackLayout Padding="15" Spacing="5">
+
+                        <!-- Сообщение об ошибке -->
+                        <Label Text="{Binding ErrorMessage}"
+                               IsVisible="{Binding HasError}"
+                               TextColor="Red"
+                               FontSize="14"
+                               Padding="10"/>
+
+                        <!-- Список вакансий -->
+                        <CollectionView ItemsSource="{Binding Vacancies}"
+                                        SelectionMode="None">
+
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <VerticalStackLayout Padding="0,5">
+                                        <Border Padding="10" 
+                                                StrokeThickness="1" 
+                                                StrokeShape="RoundRectangle 10" 
+                                                Stroke="#e0e0e0">
+
+                                            <!-- Добавляем TapGestureRecognizer на Border -->
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type local:VacancySearchViewModel}}, Path=SelectVacancyCommand}"
+                                                                      CommandParameter="{Binding Id}"/>
+                                            </Border.GestureRecognizers>
+
+                                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+
+                                                <!-- Основные данные -->
+                                                <VerticalStackLayout Grid.Column="0" Spacing="8">
+                                                    <Label Text="{Binding Title}" 
+                                                           FontSize="16" 
+                                                           FontAttributes="Bold"
+                                                           TextColor="Black"/>
+
+                                                    <Label Text="{Binding SalaryRange}" 
+                                                           FontSize="14" 
+                                                           TextColor="Green" 
+                                                           FontAttributes="Bold"/>
+
+                                                    <Label Text="{Binding WorkLocation}" 
+                                                           FontSize="14" 
+                                                           TextColor="Gray"/>
+
+                                                    <!-- Теги -->
+                                                    <CollectionView ItemsSource="{Binding Tags}" 
+                                                                    SelectionMode="None" 
+                                                                    HeightRequest="35">
+
+                                                        <CollectionView.ItemsLayout>
+                                                            <LinearItemsLayout Orientation="Horizontal" ItemSpacing="5"/>
+                                                        </CollectionView.ItemsLayout>
+
+                                                        <CollectionView.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Border Padding="5,2" 
+                                                                        StrokeThickness="0" 
+                                                                        StrokeShape="RoundRectangle 10" 
+                                                                        BackgroundColor="#f0f0f0">
+                                                                    <Label Text="{Binding .}" 
+                                                                           FontSize="11"
+                                                                           TextColor="Black"/>
+                                                                </Border>
+                                                            </DataTemplate>
+                                                        </CollectionView.ItemTemplate>
+
+                                                    </CollectionView>
+                                                </VerticalStackLayout>
+
+                                            </Grid>
+                                        </Border>
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+
+                        </CollectionView>
+
+                    </VerticalStackLayout>
+                </ScrollView>
+            </RefreshView>
+
+        </Grid>
+
+    </Grid>
+
+</ContentPage>
