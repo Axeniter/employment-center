@@ -74,49 +74,52 @@
                                FontAttributes="Bold"/>
                     </VerticalStackLayout>
 
-                    <!-- Локация и тип занятости -->
+                    <!-- Локация -->
                     <VerticalStackLayout Spacing="5">
                         <Label Text="Место работы" 
                                FontSize="16" 
                                FontAttributes="Bold"
                                TextColor="Black"/>
 
-                        <Label Text="{Binding WorkLocation}" 
-                               FontSize="16" 
-                               TextColor="Gray"/>
+                        <VerticalStackLayout Spacing="3">
+                            <Label Text="{Binding WorkLocation}" 
+                                   FontSize="14" 
+                                   TextColor="Gray"/>
+                            <Label Text="{Binding RemoteText}" 
+                                   FontSize="12" 
+                                   TextColor="Green"
+                                   IsVisible="{Binding ShowRemoteText}"/>
+                        </VerticalStackLayout>
                     </VerticalStackLayout>
 
-                    <!-- Тип занятости -->
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="Тип занятости" 
+                    <!-- Теги (вместо требований) -->
+                    <VerticalStackLayout Spacing="10" IsVisible="{Binding HasTags}">
+                        <Label Text="Требуемые навыки" 
                                FontSize="16" 
                                FontAttributes="Bold"
                                TextColor="Black"/>
 
-                        <Label Text="{Binding EmploymentType}" 
-                               FontSize="16"
-                               TextColor="Gray"/>
-                    </VerticalStackLayout>
+                        <CollectionView ItemsSource="{Binding VacancyTags}" 
+                                        SelectionMode="None"
+                                        HeightRequest="50">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="8"/>
+                            </CollectionView.ItemsLayout>
 
-                    <!-- Требования -->
-                    <VerticalStackLayout Spacing="10">
-                        <Label Text="Требования" 
-                               FontSize="16" 
-                               FontAttributes="Bold"
-                               TextColor="Black"/>
-
-                        <Frame BorderColor="#e0e0e0" 
-                               CornerRadius="10" 
-                               Padding="15"
-                               HasShadow="False"
-                               BackgroundColor="White">
-
-                            <Label Text="{Binding RequirementsText}" 
-                                   FontSize="14"
-                                   TextColor="Black"
-                                   LineBreakMode="WordWrap"/>
-
-                        </Frame>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Frame Padding="10,5" 
+                                           CornerRadius="15" 
+                                           BackgroundColor="#f0f0f0"
+                                           BorderColor="#ddd"
+                                           HasShadow="False">
+                                        <Label Text="{Binding .}" 
+                                               FontSize="12"
+                                               TextColor="Black"/>
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
                     </VerticalStackLayout>
 
                     <!-- Описание вакансии -->
@@ -190,39 +193,48 @@
                                                     </Frame>
                                                 </Grid>
 
-                                                <!-- Контактный номер -->
-                                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-                                                    <Label Grid.Column="0"
-                                                           Text="☎"
-                                                           FontSize="14"
-                                                           TextColor="#666"
-                                                           VerticalOptions="Center"/>
-                                                    <Label Grid.Column="1"
-                                                           Text="{Binding PhoneNumber}"
-                                                           FontSize="14"
+                                                <!-- Город -->
+                                                <VerticalStackLayout Spacing="3" IsVisible="{Binding CityIsVisible}">
+                                                    <Label Text="Город:" 
+                                                           FontSize="11" 
+                                                           FontAttributes="Bold"
+                                                           TextColor="#999"/>
+                                                    <Label Text="{Binding City}" 
+                                                           FontSize="12" 
                                                            TextColor="#666"/>
-                                                </Grid>
+                                                </VerticalStackLayout>
+
+                                                <!-- Контактный номер -->
+                                                <VerticalStackLayout Spacing="3" IsVisible="{Binding PhoneIsVisible}">
+                                                    <Label Text="Контакт:" 
+                                                           FontSize="11" 
+                                                           FontAttributes="Bold"
+                                                           TextColor="#999"/>
+                                                    <Label Text="{Binding PhoneNumber}" 
+                                                           FontSize="12" 
+                                                           TextColor="#666"/>
+                                                </VerticalStackLayout>
 
                                                 <!-- О себе -->
-                                                <VerticalStackLayout Spacing="5" IsVisible="{Binding About, Converter={StaticResource StringNotNullOrEmptyConverter}}">
+                                                <VerticalStackLayout Spacing="5" IsVisible="{Binding AboutIsVisible}">
                                                     <Label Text="О себе:"
-                                                           FontSize="12"
+                                                           FontSize="11"
                                                            FontAttributes="Bold"
                                                            TextColor="#999"/>
                                                     <Label Text="{Binding About}"
-                                                           FontSize="13"
+                                                           FontSize="12"
                                                            TextColor="#333"
                                                            LineBreakMode="WordWrap"/>
                                                 </VerticalStackLayout>
 
                                                 <!-- Навыки -->
-                                                <VerticalStackLayout Spacing="5" IsVisible="{Binding SkillsText, Converter={StaticResource StringNotNullOrEmptyConverter}}">
+                                                <VerticalStackLayout Spacing="5" IsVisible="{Binding SkillsIsVisible}">
                                                     <Label Text="Навыки:"
-                                                           FontSize="12"
+                                                           FontSize="11"
                                                            FontAttributes="Bold"
                                                            TextColor="#999"/>
                                                     <Label Text="{Binding SkillsText}"
-                                                           FontSize="13"
+                                                           FontSize="12"
                                                            TextColor="#333"
                                                            LineBreakMode="WordWrap"/>
                                                 </VerticalStackLayout>
@@ -238,7 +250,7 @@
                                                             CornerRadius="8"
                                                             Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AcceptResponseCommand}"
                                                             CommandParameter="{Binding Id}"
-                                                            IsEnabled="{Binding Status, StringFormat='{0:pending}'}"/>
+                                                            IsEnabled="{Binding IsPending}"/>
 
                                                     <Button Grid.Column="1"
                                                             Text="✕ Отклонить"
@@ -249,7 +261,7 @@
                                                             CornerRadius="8"
                                                             Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RejectResponseCommand}"
                                                             CommandParameter="{Binding Id}"
-                                                            IsEnabled="{Binding Status, StringFormat='{0:pending}'}"/>
+                                                            IsEnabled="{Binding IsPending}"/>
                                                 </Grid>
 
                                             </VerticalStackLayout>
@@ -266,7 +278,7 @@
                                FontSize="14"
                                TextColor="Gray"
                                HorizontalTextAlignment="Center"
-                               IsVisible="{Binding HasResponses, Converter={StaticResource InvertedBoolConverter}}"/>
+                               IsVisible="{Binding NoResponses}"/>
 
                     </VerticalStackLayout>
 

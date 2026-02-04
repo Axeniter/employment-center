@@ -71,7 +71,7 @@ async def get_response_by_id(db: AsyncSession, response_id: int) -> Optional[Res
 async def get_responses_by_vacancy(db: AsyncSession, vacancy_id: int) -> List[Response]:
     result = await db.execute(
         select(Response)
-        .options(joinedload(Response.applicant).joinedload(User.applicant_profile))
+        .options(joinedload(Response.applicant))
         .where(Response.vacancy_id == vacancy_id)
         .order_by(desc(Response.created_at))
     )

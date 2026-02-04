@@ -55,7 +55,6 @@ namespace EmploymentApp.Viewmodels
             _apiClient = apiClient;
             _authService = authService;
 
-            // Устанавливаем значения по умолчанию
             DateString = DateTime.Now.ToString("yyyy-MM-dd");
             TimeString = DateTime.Now.ToString("HH:mm");
         }
@@ -173,10 +172,8 @@ namespace EmploymentApp.Viewmodels
                         "OK"
                     );
 
-                    // Очищаем форму
                     ClearForm();
 
-                    // Переходим на предыдущую страницу
                     await Shell.Current.GoToAsync("//EmployerPage");
 
                     Debug.WriteLine("Event created successfully");

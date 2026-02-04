@@ -6,12 +6,12 @@
     xmlns:local="clr-namespace:EmploymentApp"
     xmlns:pages="clr-namespace:EmploymentApp.Pages"
     Title="EmploymentApp">
-    
+
     <ShellContent
         Title="Login page"
         ContentTemplate="{DataTemplate pages:LoginPage}"
         Route="LoginPage" />
-    
+
     <ShellContent
         Title="Vacancies page"
         ContentTemplate="{DataTemplate pages:VacancySearchPage}"
@@ -62,6 +62,7 @@
         ContentTemplate="{DataTemplate pages:VacancyDetailPage}"
         Route="vacancydetail" />
 
+    <!-- ✅ Этот маршрут БЕЗ Flyout (обычная Shell навигация) -->
     <ShellContent
         Title="VacancyDetailEmployerPage"
         ContentTemplate="{DataTemplate pages:VacancyDetailEmployerPage}"

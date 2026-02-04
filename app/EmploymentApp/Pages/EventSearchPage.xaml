@@ -199,7 +199,7 @@
 
                                                     <Label Text="{Binding FormattedDateTime}" 
                                                            FontSize="14" 
-                                                           TextColor="Blue" 
+                                                           TextColor="Green" 
                                                            FontAttributes="Bold"/>
 
                                                     <Label Text="{Binding WorkLocation}" 

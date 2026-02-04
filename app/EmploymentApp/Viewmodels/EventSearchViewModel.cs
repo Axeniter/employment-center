@@ -93,7 +93,6 @@ namespace EmploymentApp.Viewmodels
 
                 var token = await _authService.GetAccessTokenAsync();
 
-                // Построение URL с параметрами фильтрации
                 var queryParams = BuildQueryParams();
                 var url = $"/events/?{queryParams}";
 
@@ -102,7 +101,7 @@ namespace EmploymentApp.Viewmodels
                 if (response != null)
                 {
                     var eventViewModels = response
-                        .Where(e => e.IsActive)  // Фильтруем только активные события
+                        .Where(e => e.IsActive)  
                         .Select(e => e.ToViewModel())
                         .ToList();
 
@@ -136,29 +135,24 @@ namespace EmploymentApp.Viewmodels
         {
             var parameters = new List<string>();
 
-            // Добавляем параметры пагинации
             parameters.Add($"page={CurrentPage}");
             parameters.Add($"limit={PageSize}");
 
-            // Поиск по названию/описанию
             if (!string.IsNullOrWhiteSpace(SearchText))
             {
                 parameters.Add($"search_text={Uri.EscapeDataString(SearchText)}");
             }
 
-            // Фильтр по локации
             if (!string.IsNullOrWhiteSpace(FilterLocation))
             {
                 parameters.Add($"location={Uri.EscapeDataString(FilterLocation)}");
             }
 
-            // Фильтр по удалённости
             if (FilterIsRemote)
             {
                 parameters.Add("is_remote=true");
             }
 
-            // Фильтр по дате начала
             if (!string.IsNullOrWhiteSpace(DateFromString))
             {
                 if (DateTime.TryParse(DateFromString, out var dateFrom))
@@ -167,7 +161,6 @@ namespace EmploymentApp.Viewmodels
                 }
             }
 
-            // Фильтр по дате конца
             if (!string.IsNullOrWhiteSpace(DateToString))
             {
                 if (DateTime.TryParse(DateToString, out var dateTo))
@@ -182,7 +175,7 @@ namespace EmploymentApp.Viewmodels
         [RelayCommand]
         public async Task ApplyFilters()
         {
-            CurrentPage = 1; // Сброс на первую страницу при применении фильтров
+            CurrentPage = 1; 
             await LoadEvents();
         }
 

@@ -121,9 +121,6 @@ namespace EmploymentApp.Viewmodels
             _authService = authService;
         }
 
-        /// <summary>
-        /// Автоматически вызывается когда меняется VacancyId из QueryProperty
-        /// </summary>
         partial void OnVacancyIdChanged(int value)
         {
             if (value > 0)
@@ -262,7 +259,6 @@ namespace EmploymentApp.Viewmodels
                     return;
                 }
 
-                // POST запрос на отклик вакансии
                 var response = await _apiClient.PostAsync(
                     $"/responses/vacancy/{VacancyId}",
                     new { },
@@ -286,7 +282,6 @@ namespace EmploymentApp.Viewmodels
                     var errorContent = await response.Content.ReadAsStringAsync();
                     Debug.WriteLine($"Apply error: {response.StatusCode} - {errorContent}");
 
-                    // Проверяем если ошибка что уже откликнулись
                     if (response.StatusCode == System.Net.HttpStatusCode.BadRequest &&
                         errorContent.Contains("already responded"))
                     {
